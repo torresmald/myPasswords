@@ -1,0 +1,26 @@
+<app-auth-form
+  #authForm
+  [config]="formConfig"
+  title="Register"
+  (formSubmit)="onRegister($event)"
+>
+  <!-- Form-level error messages -->
+  <div slot="form-errors">
+    @if (authForm.hasFormError('passwordNotEqual')) {
+      <p class="text-error text-sm mb-2 text-center">
+        {{ authForm.getFormError('passwordNotEqual') }}
+      </p>
+    }
+  </div>
+
+  <!-- Submit button -->
+  <div slot="submit-button" class="card-actions justify-end">
+    <button class="btn btn-primary w-full" type="submit">Register</button>
+  </div>
+
+  <!-- Additional content -->
+  <div slot="additional-content" class="flex justify-around items-center gap-2 mt-2">
+    <span class="text-sm">Already have an account?</span>
+    <button class="btn btn-accent" routerLink="../login">Login</button>
+  </div>
+</app-auth-form>
