@@ -1,7 +1,16 @@
 import { FormHelpers } from '@auth/helpers/form.helpers';
-import { ChangeDetectionStrategy, Component, inject, Input, Output, EventEmitter, OnInit, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  input,
+  output,
+  effect,
+} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FormConfig, FormData } from '@auth/interfaces/form-config.interface';
+import { FormConfig, FormDataConfig } from '@auth/interfaces/form-config.interface';
+import { ModalService } from '@/shared/services/modal.service';
 
 @Component({
   selector: 'app-auth-form',
@@ -10,11 +19,21 @@ import { FormConfig, FormData } from '@auth/interfaces/form-config.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthFormComponent implements OnInit {
-
-
+  private modalService = inject(ModalService);
   public config = input.required<FormConfig>();
   public title = input.required<string>();
-  public formSubmit = output<FormData>()
+  public submitButtonText = input.required<string>();
+  public isAuthForm = input.required<boolean>();
+
+  public shouldResetForm = input.required<boolean>();
+
+  public effectForm = effect(() => {
+    if (this.shouldResetForm()) {
+      this.createForm();
+    }
+  });
+
+  public formSubmit = output<FormDataConfig>();
 
   private fb = inject(FormBuilder);
 
@@ -27,12 +46,12 @@ export class AuthFormComponent implements OnInit {
   private createForm() {
     const formControls: { [key: string]: any } = {};
 
-    this.config().fields.forEach(field => {
+    this.config().fields.forEach((field) => {
       formControls[field.name] = ['', field.validators];
     });
 
     this.myForm = this.fb.group(formControls, {
-      validators: this.config().validators || null
+      validators: this.config().validators || null,
     });
   }
 
@@ -53,13 +72,28 @@ export class AuthFormComponent implements OnInit {
   }
 
   public getFieldConfig(fieldName: string) {
-    return this.config().fields.find(field => field.name === fieldName);
+    return this.config().fields.find((field) => field.name === fieldName);
   }
 
-  onSubmit() {
+  public isFormValid(): boolean {
+    const fields = this.config().fields;
+    return (
+      this.myForm.valid &&
+      fields.some((field) => {
+        const control = this.myForm.get(field.name);
+        return control && control.value && control.value.toString().trim() !== '';
+      })
+    );
+  }
+
+  public onSubmit() {
     this.myForm.markAllAsTouched();
     if (this.myForm.valid) {
       this.formSubmit.emit(this.myForm.value);
     }
+  }
+
+  public onCancel() {
+    this.modalService.showModal(false);
   }
 }

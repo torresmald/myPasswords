@@ -1,0 +1,47 @@
+@if (getModal()) {
+<dialog class="modal" [open]="getModal()" (close)="closeModal()">
+  <div class="modal-box max-w-md">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" (click)="closeModal()">
+        ✕
+      </button>
+    </form>
+
+    @if (loading()) {
+    <app-loading></app-loading>
+    } @else {
+    <!-- Generic Form Content -->
+    <app-auth-form
+      [config]="getFormConfig()"
+      [title]="getTitle()"
+      [submitButtonText]="getSubmitButtonText()"
+      [isAuthForm]="false"
+      [shouldResetForm]="shouldResetForm()"
+      (formSubmit)="onFormSubmit($event)"
+    >
+      <!-- Additional fields slot for future extensions -->
+      <div slot="additional-fields">
+        @if (getModalType() === 'add-category') {
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            class="checkbox checkbox-primary"
+            [checked]="checked()"
+            (change)="checked.set($event.target.checked)"
+          />
+          <span>Add Image to Category</span>
+        </label>
+        @if (checked()) {
+        <input
+          type="file"
+          class="file-input-ghost file-input mt-2"
+          (change)="onSelectImage($event)"
+          accept="image/*"
+        />
+        } }
+      </div>
+    </app-auth-form>
+    }
+  </div>
+</dialog>
+}

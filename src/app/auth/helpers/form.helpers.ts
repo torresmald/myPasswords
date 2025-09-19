@@ -13,7 +13,7 @@ export class FormHelpers {
         case 'pattern':
           return `El campo no tiene un formato valido`;
         case 'passwordNotEqual':
-          return 'Los password no son iguales'
+          return 'Los password no son iguales';
       }
     }
     return null;
@@ -48,5 +48,6 @@ export class FormHelpers {
   }
 
   static emailPattern = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$';
-  static passwordPattern = '^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$';
+  static passwordPattern =
+    '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$';
 }

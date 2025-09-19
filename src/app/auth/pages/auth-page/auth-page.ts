@@ -7,4 +7,4 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './auth-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class AuthPageComponent { }
+export default class AuthPageComponent {}

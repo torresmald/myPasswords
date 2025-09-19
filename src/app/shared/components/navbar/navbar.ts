@@ -1,4 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { AuthService } from '@/auth/services/auth.service';
+import { ModalService } from '@/shared/services/modal.service';
+import { RouterService } from '@/shared/services/router.service';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 @Component({
   selector: 'app-navbar',
@@ -6,4 +9,25 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   templateUrl: './navbar.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarComponent { }
+export class NavbarComponent {
+  private authService = inject(AuthService);
+  private routerService = inject(RouterService);
+
+  public logout() {
+    this.authService.logout();
+  }
+
+  private modalService = inject(ModalService);
+
+  public addPassword() {
+    this.modalService.openAddPasswordModal();
+  }
+
+  public addCategory() {
+    this.modalService.openAddCategoryModal();
+  }
+
+  public updateData() {
+    this.routerService.navigateTo('/auth/update');
+  }
+}

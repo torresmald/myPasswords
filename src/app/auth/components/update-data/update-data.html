@@ -1,0 +1,27 @@
+<app-auth-form
+  #authForm
+  [config]="formConfig"
+  title="Update Data"
+  (formSubmit)="onUpdateData($event)"
+  [shouldResetForm]="shouldResetForm()"
+  [isAuthForm]="true"
+  [submitButtonText]="'Update Data'"
+>
+  <!-- Form-level error messages -->
+  <div slot="form-errors">
+    @if (authForm.hasFormError('passwordNotEqual')) {
+    <p class="text-error text-sm mb-2 text-center">
+      {{ authForm.getFormError('passwordNotEqual') }}
+    </p>
+    }
+  </div>
+  <!-- Additional content -->
+  <button
+    slot="additional-content"
+    class="btn btn-accent w-full"
+    type="button"
+    routerLink="../passwords"
+  >
+    Back
+  </button>
+</app-auth-form>
