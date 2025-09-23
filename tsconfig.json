@@ -3,13 +3,13 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["./src/app/*"],
-      "@auth/*": ["./src/app/auth/*"],
-      "@shared/*": ["./src/app/shared/*"],
-      "@passwords/*": ["./src/app/passwords/*"],
-      "@environments/*": ["./src/environments/*"]
+      "@/*": ["app/*"],
+      "@auth/*": ["app/auth/*"],
+      "@shared/*": ["app/shared/*"],
+      "@passwords/*": ["app/passwords/*"],
+      "@environments/*": ["environments/*"]
     },
     "strict": true,
     "noImplicitOverride": true,

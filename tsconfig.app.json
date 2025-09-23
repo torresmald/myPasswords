@@ -5,20 +5,15 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "types": [],
-    "baseUrl": "./",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["./src/app/*"],
-      "@auth/*": ["./src/app/auth/*"],
-      "@shared/*": ["./src/app/shared/*"],
-      "@passwords/*": ["./src/app/passwords/*"],
-      "@category/*": ["./src/app/category/*"],
-      "@environments/*": ["./src/environments/*"]
+      "@/*": ["app/*"],
+      "@auth/*": ["app/auth/*"],
+      "@shared/*": ["app/shared/*"],
+      "@passwords/*": ["app/passwords/*"],
+      "@environments/*": ["environments/*"]
     }
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "src/**/*.spec.ts"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
 }
