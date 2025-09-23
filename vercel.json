@@ -1,0 +1,11 @@
+{
+  "buildCommand": "node mynode.js && npm run build",
+  "outputDirectory": "dist/myPasswords",
+  "framework": "angular",
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
