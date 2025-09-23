@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { environment } from '@environments/environment';
+import { environment } from '../../../environments/environment';
 import { catchError, delay, Observable, throwError } from 'rxjs';
 import { Category, CreateCategory } from '../interfaces';
 import { HttpClient } from '@angular/common/http';

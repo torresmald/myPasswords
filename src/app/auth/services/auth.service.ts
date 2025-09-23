@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { environment } from '@environments/environment';
 import { catchError, delay, map, Observable, of, tap, throwError } from 'rxjs';
 import {
   AuthStatus,
@@ -16,6 +15,7 @@ import { RouterService } from '@/shared/services/router.service';
 import { ImageService } from '@/shared/services/image.service';
 import { AlertService } from '@/shared/services/alert.service';
 import { LoadingService } from '@/shared/services/loading.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',

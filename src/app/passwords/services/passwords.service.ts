@@ -1,13 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { environment } from '@environments/environment';
+import { environment } from '../../../environments/environment';
+
 import { catchError, delay, map, Observable, tap, throwError } from 'rxjs';
-import {
-  Password,
-  CreatePassword,
-  CreatePasswordApiResponse,
-  ViewPassword,
-} from '../interfaces';
+import { Password, CreatePassword, CreatePasswordApiResponse, ViewPassword } from '../interfaces';
 import { AlertService } from '@/shared/services/alert.service';
 import { LoadingService } from '@/shared/services/loading.service';
 
