@@ -16,4 +16,13 @@ export class PasswordComponent {
   public showPassword() {
     this.modalService.openViewPasswordModal(this.password().id);
   }
+
+  public getCategoryBackgroundImage(categoryImage?: string): string {
+    if (categoryImage) {
+      return `url(${categoryImage})`;
+    }
+    const defaultImage =
+      'https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp';
+    return `url(${defaultImage})`;
+  }
 }

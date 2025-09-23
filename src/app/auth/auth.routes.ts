@@ -24,7 +24,7 @@ export const authRoutes: Routes = [
       {
         path: 'update',
         loadComponent: () => import('./components/update-data/update-data'),
-        //canActivate: [isValidToken],
+        canActivate: [isValidToken],
       },
       {
         path: 'confirm-account/:token',

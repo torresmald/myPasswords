@@ -9,11 +9,11 @@ import {
   effect,
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FormConfig, FormDataConfig } from '@auth/interfaces/form-config.interface';
+import { FormConfig, FormDataConfig } from '@/auth/interfaces/form-config.interface';
 import { ModalService } from '@/shared/services/modal.service';
 
 @Component({
-  selector: 'app-auth-form',
+  selector: 'app-form',
   imports: [ReactiveFormsModule],
   templateUrl: './form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,13 +75,13 @@ export class AuthFormComponent implements OnInit {
     return this.config().fields.find((field) => field.name === fieldName);
   }
 
-  public isFormValid(): boolean {
+  public isDisabledSubmitButton(): boolean {
     const fields = this.config().fields;
     return (
-      this.myForm.valid &&
+      !this.myForm.valid  &&
       fields.some((field) => {
         const control = this.myForm.get(field.name);
-        return control && control.value && control.value.toString().trim() !== '';
+        return control && control.value.toString().trim() === '';
       })
     );
   }

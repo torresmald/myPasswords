@@ -1,17 +1,23 @@
 @if (getModal()) {
 <dialog class="modal" [open]="getModal()" (close)="closeModal()">
   <div class="modal-box max-w-md">
-    <form method="dialog">
+    <div method="dialog">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" (click)="closeModal()">
         ✕
       </button>
-    </form>
+    </div>
 
-    @if (loading()) {
-    <app-loading></app-loading>
+    @if(getModalType() === 'view-password-data') {
+    <div class="flex flex-col gap-2 justify-center items-center">
+      <h1 class="text-2xl font-bold">Password Data</h1>
+      <p class="text-sm text-gray-500">
+        Password:
+        <span class="font-bold cursor-pointer" (click)="copyPassword(password())">{{ password() }}</span>
+      </p>
+    </div>
     } @else {
     <!-- Generic Form Content -->
-    <app-auth-form
+    <app-form
       [config]="getFormConfig()"
       [title]="getTitle()"
       [submitButtonText]="getSubmitButtonText()"
@@ -24,6 +30,7 @@
         @if (getModalType() === 'add-category') {
         <label class="flex items-center gap-2">
           <input
+            id="checkbox-add-image-to-category"
             type="checkbox"
             class="checkbox checkbox-primary"
             [checked]="checked()"
@@ -33,6 +40,7 @@
         </label>
         @if (checked()) {
         <input
+          id="file-input-add-image-to-category"
           type="file"
           class="file-input-ghost file-input mt-2"
           (change)="onSelectImage($event)"
@@ -40,7 +48,7 @@
         />
         } }
       </div>
-    </app-auth-form>
+    </app-form>
     }
   </div>
 </dialog>

@@ -3,4 +3,5 @@ export interface UpdateUser {
   token: string;
   password: string;
   repeatPassword: string;
+  image?: File;
 }

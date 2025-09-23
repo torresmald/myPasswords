@@ -1,7 +1,6 @@
 import { computed, Injectable, signal } from '@angular/core';
-
-type ModalType = 'add-password' | 'view-password' | 'edit-password' | 'add-category' | 'update-data';
-
+import { ModalType } from '../interfaces/modal.interface';
+import { Password } from '@/passwords/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -11,19 +10,20 @@ export class ModalService {
   private title$ = signal('');
   private modalType$ = signal<ModalType | null>(null);
   private passwordId$ = signal<string>('');
+  private password$ = signal<string>('');
 
   public modal = computed(() => this.modal$());
   public title = computed(() => this.title$());
   public modalType = computed(() => this.modalType$());
   public passwordId = computed(() => this.passwordId$());
+  public password = computed(() => this.password$());
 
-  public showModal(condition: boolean) {
+  public showModal(condition: boolean = false) {
     this.modal$.set(condition);
 
     // Si se cierra el modal, limpiar datos
     if (!condition) {
-      this.modalType$.set(null);
-      this.passwordId$.set('');
+      this.resetModal();
     }
   }
 
@@ -31,7 +31,7 @@ export class ModalService {
     this.title$.set(text);
   }
 
-  public setModalType(type: ModalType) {
+  public setModalType(type: ModalType | null) {
     this.modalType$.set(type);
   }
 
@@ -49,10 +49,26 @@ export class ModalService {
     this.showModal(true);
   }
 
-  public openAddCategoryModal(){
+  public openViewPasswordModalData(password: Password) {
+    this.setTitle('Password Data');
+    this.setModalType('view-password-data');
+    this.passwordId$.set(password.id);
+    this.password$.set(password.password!);
+    this.showModal(true);
+  }
+
+  public openAddCategoryModal() {
     this.setTitle('Add New Category');
     this.setModalType('add-category');
     this.passwordId$.set('');
     this.showModal(true);
+  }
+
+  public resetModal() {
+    this.setTitle('');
+    this.setModalType(null);
+    this.showModal(false);
+    this.passwordId$.set('');
+    this.password$.set('');
   }
 }

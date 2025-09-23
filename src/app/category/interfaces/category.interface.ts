@@ -4,6 +4,7 @@ export interface Category{
   id: string,
   name: string,
   user: UserApi
+  image?: string
 }
 
 

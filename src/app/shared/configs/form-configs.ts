@@ -1,5 +1,5 @@
 import { Validators } from '@angular/forms';
-import { FormConfig } from '@auth/interfaces/form-config.interface';
+import { FormConfig } from '@/auth/interfaces/form-config.interface';
 import { FormHelpers } from '@auth/helpers/form.helpers';
 
 export const LOGIN_CONFIG: FormConfig = {
@@ -109,8 +109,8 @@ export const CREATE_CATEGORY_CONFIG: FormConfig = {
 export const VIEW_PASSWORD_CONFIG: FormConfig = {
   fields: [
     {
-      name: 'code',
-      type: 'password',
+      name: 'otp',
+      type: 'text',
       placeholder: 'Enter Received Code',
       autocomplete: 'off',
       validators: [Validators.required],

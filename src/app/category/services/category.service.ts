@@ -1,14 +1,16 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment.development';
-import { delay, Observable } from 'rxjs';
-import { Category } from '../interfaces';
+import { catchError, delay, Observable, throwError } from 'rxjs';
+import { Category, CreateCategory } from '../interfaces';
 import { HttpClient } from '@angular/common/http';
+import { ImageService } from '@/shared/services/image.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoryService {
   private http = inject(HttpClient);
+  private imageService = inject(ImageService);
 
   private categories$ = signal<Category[]>([]);
   public categories = computed(() => this.categories$());
@@ -16,20 +18,33 @@ export class CategoryService {
     this.categories$.set(categories);
   }
 
-  private imageCategoryBase64$ = signal<File | null>(null);
-  public imageCategoryBase64 = computed(() => this.imageCategoryBase64$());
-
-  public setImageCategoryBase64(file: File) {
-    this.imageCategoryBase64$.set(file);
-  }
-
   public getAllCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${environment.API_URL}/categories/getAll`).pipe(delay(1000));
+    return this.http.get<Category[]>(`${environment.API_URL}/categories/getAll`).pipe(
+      delay(1000),
+
+      catchError((error) => throwError(() => error))
+    );
   }
 
   public createCategory(formData: FormData): Observable<Category> {
-    return this.http
-      .post<Category>(`${environment.API_URL}/categories/create`, formData)
-      .pipe(delay(1000));
+    return this.http.post<Category>(`${environment.API_URL}/categories/create`, formData).pipe(
+      delay(1000),
+      catchError((error) => throwError(() => error))
+    );
+  }
+
+  public prepareFormData(category: CreateCategory) {
+    const formData = new FormData();
+    formData.append('name', category.name);
+    formData.append('userId', category.userId);
+    if (this.imageService.imageCategoryBase64() != null) {
+      category.image = this.imageService.imageCategoryBase64()!;
+      formData.append('image', category.image);
+    }
+    return formData;
+  }
+
+  public async onSelectImage(event: Event) {
+    this.imageService.onSelectImage(event);
   }
 }

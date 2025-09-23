@@ -1,4 +1,4 @@
-<app-auth-form
+<app-form
   #authForm
   [config]="formConfig"
   title="Update Data"
@@ -15,6 +15,27 @@
     </p>
     }
   </div>
+
+  <!-- Additional fields slot for future extensions -->
+  <div slot="additional-fields">
+    <label class="flex items-center gap-2">
+      <input
+        type="checkbox"
+        class="checkbox checkbox-primary"
+        [checked]="checked()"
+        (change)="checked.set($event.target.checked)"
+      />
+      <span>Replace Image to User</span>
+    </label>
+    @if (checked()) {
+    <input
+      type="file"
+      class="file-input-ghost file-input mt-2"
+      (change)="onSelectImage($event)"
+      accept="image/*"
+    />
+    }
+  </div>
   <!-- Additional content -->
   <button
     slot="additional-content"
@@ -24,4 +45,4 @@
   >
     Back
   </button>
-</app-auth-form>
+</app-form>

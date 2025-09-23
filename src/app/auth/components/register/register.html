@@ -1,4 +1,12 @@
-<app-auth-form #authForm [config]="formConfig" title="Register" (formSubmit)="onRegister($event)" [shouldResetForm]="shouldResetForm()" [isAuthForm]="true" [submitButtonText]="'Register'">
+<app-form
+  #authForm
+  [config]="formConfig"
+  title="Register"
+  (formSubmit)="onRegister($event)"
+  [shouldResetForm]="shouldResetForm()"
+  [isAuthForm]="true"
+  [submitButtonText]="'Register'"
+>
   <!-- Form-level error messages -->
   <div slot="form-errors">
     @if (authForm.hasFormError('passwordNotEqual')) {
@@ -8,10 +16,32 @@
     }
   </div>
 
+  <!-- Additional fields slot for future extensions -->
+  <div slot="additional-fields">
+    <label class="flex items-center gap-2">
+      <input
+        id="checkbox-add-image-to-user"
+        type="checkbox"
+        class="checkbox checkbox-primary"
+        [checked]="checked()"
+        (change)="checked.set($event.target.checked)"
+      />
+      <span>Add Image to User</span>
+    </label>
+    @if (checked()) {
+    <input
+      id="file-input-add-image-to-user"
+      type="file"
+      class="file-input-ghost file-input mt-2"
+      (change)="onSelectImage($event)"
+      accept="image/*"
+    />
+    }
+  </div>
 
   <!-- Additional content -->
   <div slot="additional-content" class="flex justify-around items-center gap-2 mt-2">
     <span class="text-sm">Already have an account?</span>
     <button class="btn btn-accent" routerLink="../login">Login</button>
   </div>
-</app-auth-form>
+</app-form>

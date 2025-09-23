@@ -1,5 +1,5 @@
 import { AuthService } from '@/auth/services/auth.service';
-import { AlertService } from '@/shared/services/alert.service';
+import { LoadingService } from '@/shared/services/loading.service';
 import { RouterService } from '@/shared/services/router.service';
 import { ChangeDetectionStrategy, Component, inject, input, OnInit } from '@angular/core';
 
@@ -12,28 +12,29 @@ import { ChangeDetectionStrategy, Component, inject, input, OnInit } from '@angu
 export default class ConfirmAccountComponent implements OnInit {
   public token = input.required<string>();
   private authService = inject(AuthService);
-  private alertService = inject(AlertService);
   private routerService = inject(RouterService);
+  private loadingService = inject(LoadingService);
 
   ngOnInit(): void {
     this.confirmAccount(this.token());
   }
 
   private confirmAccount(token: string) {
-    this.authService.confirmAccount(token).subscribe({
-      next: (response) => {
-        this.alertService.setAlertMessage('User Confirmed');
-        this.alertService.setAlertType('success');
-        this.alertService.showAlert(true);
-        setTimeout(() => {
+    this.loadingService.showLoading(true);
+
+    try {
+      this.authService.confirmAccount(token).subscribe({
+        next: (response) => {
+          this.authService.setErrors('User Confirmed', 'success');
           this.routerService.navigateTo('/auth/login');
-        }, 2000);
-      },
-      error: (errorMessage) => {
-        this.alertService.setAlertMessage(errorMessage);
-        this.alertService.setAlertType('error');
-        this.alertService.showAlert(true);
-      },
-    });
+        },
+        error: (errorMessage) => {
+          this.authService.setErrors(errorMessage);
+        },
+        complete: () => this.loadingService.showLoading(false),
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

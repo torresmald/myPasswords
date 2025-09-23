@@ -1,13 +1,13 @@
 <nav class="navbar bg-base-100 shadow-sm flex justify-between items-center">
   <h1 class="text-xl font-bold ml-2">MyPasswords</h1>
-  <div class="flex gap-2">
+  <div class="flex gap-8 items-center">
+    <p class="text-sm">Welcome,
+      <span class="font-bold">{{ user()?.name }}</span>
+    </p>
     <div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
-          <img
-            alt="MyPasswords"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-          />
+          <img alt="MyPasswords" [src]="user()?.image || 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'" />
         </div>
       </div>
       <ul

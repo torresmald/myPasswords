@@ -1,9 +1,18 @@
 @if (loading()) {
-<div class="flex w-full flex-col gap-4 z-[1000]">
-  <div class="skeleton h-32 w-full"></div>
-  <div class="skeleton h-4 w-28"></div>
-  <div class="skeleton h-4 w-full"></div>
-  <div class="skeleton h-4 w-full"></div>
-</div>
+<div class="fixed inset-0 bg-base-100 bg-opacity-90 backdrop-blur-sm z-[100000] flex items-center justify-center">
+  <div class="flex flex-col items-center gap-4 p-8">
+    <!-- Spinner -->
+    <span class="loading loading-spinner loading-lg text-primary"></span>
 
+    <!-- Loading text -->
+    <p class="text-base-content font-medium">Loading...</p>
+
+    <!-- Optional skeleton for content preview -->
+    <div class="flex flex-col gap-2 w-64">
+      <div class="skeleton h-4 w-full"></div>
+      <div class="skeleton h-4 w-3/4"></div>
+      <div class="skeleton h-4 w-1/2"></div>
+    </div>
+  </div>
+</div>
 }

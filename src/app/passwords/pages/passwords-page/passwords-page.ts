@@ -23,9 +23,9 @@ export default class PasswordsPageComponent {
   });
 
   public passwords = computed(() => this.passwordsService.passwords());
+  public modal = computed(() => this.modalService.modal());
 
   public passwordsEffect = effect(() => {
-
     if (this.isUserReady()) {
       const user = this.authService.getUser();
       if (user?.id) {
@@ -38,10 +38,7 @@ export default class PasswordsPageComponent {
     this.modalService.openAddPasswordModal();
   }
 
-  public addCategory(){
+  public addCategory() {
     this.modalService.openAddCategoryModal();
-
   }
-
-
 }

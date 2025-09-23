@@ -2,7 +2,8 @@ import { FormDataConfig, UpdateUser } from '@/auth/interfaces';
 import { AuthService } from '@/auth/services/auth.service';
 import { AuthFormComponent } from '@/shared/components/form/form';
 import { UPDATE_DATA } from '@/shared/configs/form-configs';
-import { AlertService } from '@/shared/services/alert.service';
+import { ImageService } from '@/shared/services/image.service';
+import { LoadingService } from '@/shared/services/loading.service';
 import { RouterService } from '@/shared/services/router.service';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -17,28 +18,29 @@ export default class UpdateDataComponent {
   formConfig = UPDATE_DATA;
   private authService = inject(AuthService);
   private routerService = inject(RouterService);
-  alertService = inject(AlertService);
+  private loadingService = inject(LoadingService);
+  private imageService = inject(ImageService);
+  public checked = signal(false);
 
-  public shouldResetForm = signal(false);
+  public shouldResetForm = this.authService.shouldResetForm;
 
   onUpdateData(userData: FormDataConfig) {
-    console.log('Envio');
-
     this.shouldResetForm.set(false);
     const data: UpdateUser = userData as UpdateUser;
     data.token = this.authService.getToken()!;
+    const formData = this.authService.prepareFormDataUpdate(data);
+    this.loadingService.showLoading(true);
     try {
-      this.authService.updateUserData(data).subscribe({
+      this.authService.updateUserData(formData).subscribe({
         next: (response) => {
-          this.alertService.setAlertMessage(response.message);
-          this.alertService.setAlertType('success');
-          this.alertService.showAlert(true);
-          setTimeout(() => {
-            this.routerService.navigateTo('/passwords');
-          }, 2000);
+          this.authService.setErrors(response.message, 'success');
+          this.routerService.navigateTo('/passwords');
         },
         error: (response) => {
-          this.setErrors(response);
+          this.authService.setErrors(response);
+        },
+        complete: () => {
+          this.loadingService.showLoading(false);
         },
       });
     } catch (error) {
@@ -46,10 +48,7 @@ export default class UpdateDataComponent {
     }
   }
 
-  private setErrors(message: string = 'Update User Data Error') {
-    this.alertService.setAlertMessage(message);
-    this.alertService.showAlert(true);
-    this.alertService.setAlertType('error');
-    this.shouldResetForm.set(true);
+  public onSelectImage(event: Event) {
+    this.imageService.onSelectImage(event);
   }
 }

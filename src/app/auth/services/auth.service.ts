@@ -7,11 +7,15 @@ import {
   ForgotPassword,
   ForgotPasswordReset,
   UpdateUser,
-  User,
+  UserLogin,
   UserApi,
+  UserRegister,
 } from '../interfaces';
 import { PasswordsService } from '@/passwords/services/passwords.service';
 import { RouterService } from '@/shared/services/router.service';
+import { ImageService } from '@/shared/services/image.service';
+import { AlertService } from '@/shared/services/alert.service';
+import { LoadingService } from '@/shared/services/loading.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +24,11 @@ export class AuthService {
   private http = inject(HttpClient);
   private passwordsService = inject(PasswordsService);
   private routerService = inject(RouterService);
+  private imageService = inject(ImageService);
+  private alertService = inject(AlertService);
+  private loadingService = inject(LoadingService);
 
+  public shouldResetForm = signal(false);
   private authStatus = signal<AuthStatus>('checking');
   private user = signal<UserApi | null>(null);
   private token = signal<string | null>(localStorage.getItem('token'));
@@ -33,7 +41,7 @@ export class AuthService {
     return 'not-authenticated';
   });
 
-  public register(user: User): Observable<UserApi> {
+  public register(user: FormData): Observable<UserApi> {
     return this.http.post<UserApi>(`${environment.API_URL}/auth/register`, user).pipe(
       delay(1000),
       map((user) => this.setResponses('authenticated', user)),
@@ -44,7 +52,7 @@ export class AuthService {
     );
   }
 
-  public login(user: User): Observable<UserApi> {
+  public login(user: UserLogin): Observable<UserApi> {
     return this.http.post<UserApi>(`${environment.API_URL}/auth/login`, user).pipe(
       delay(1000),
       map((user) => {
@@ -104,7 +112,7 @@ export class AuthService {
       );
   }
 
-  public updateUserData(updateUserData: UpdateUser): Observable<ForgotPassword> {
+  public updateUserData(updateUserData: FormData): Observable<ForgotPassword> {
     return this.http.put<ForgotPassword>(`${environment.API_URL}/auth/update`, updateUserData).pipe(
       delay(1000),
       catchError((error) => throwError(() => error))
@@ -126,5 +134,37 @@ export class AuthService {
     localStorage.removeItem('token');
     this.passwordsService.clearPasswords();
     this.routerService.navigateTo('/auth/login');
+  }
+
+  public prepareFormData(user: UserRegister) {
+    const formData = new FormData();
+    formData.append('name', user.name);
+    formData.append('email', user.email);
+    formData.append('password', user.password);
+    if (this.imageService.imageCategoryBase64() != null) {
+      user.image = this.imageService.imageCategoryBase64()!;
+      formData.append('image', user.image);
+    }
+    return formData;
+  }
+
+  public prepareFormDataUpdate(userUpdated: UpdateUser) {
+    const formData = new FormData();
+    formData.append('name', userUpdated.name);
+    formData.append('password', userUpdated.password);
+    formData.append('token', userUpdated.token);
+    if (this.imageService.imageCategoryBase64() != null) {
+      userUpdated.image = this.imageService.imageCategoryBase64()!;
+      formData.append('image', userUpdated.image);
+    }
+    return formData;
+  }
+
+  public setErrors(message: string, type: 'success' | 'error' = 'error') {
+    this.alertService.setAlertMessage(message);
+    this.alertService.showAlert(true);
+    this.alertService.setAlertType(type);
+    this.shouldResetForm.set(true);
+    this.loadingService.showLoading(false);
   }
 }

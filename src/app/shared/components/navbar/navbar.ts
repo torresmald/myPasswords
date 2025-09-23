@@ -13,6 +13,8 @@ export class NavbarComponent {
   private authService = inject(AuthService);
   private routerService = inject(RouterService);
 
+  public user = this.authService.getUser
+
   public logout() {
     this.authService.logout();
   }

@@ -1,10 +1,11 @@
-import { FormDataConfig, User } from '@/auth/interfaces';
+import { FormDataConfig, UserLogin } from '@/auth/interfaces';
 import { AuthService } from '@/auth/services/auth.service';
 import { AuthFormComponent } from '@/shared/components/form/form';
 import { FORGOT_PASSWORD } from '@/shared/configs/form-configs';
 import { AlertService } from '@/shared/services/alert.service';
+import { LoadingService } from '@/shared/services/loading.service';
 import { RouterService } from '@/shared/services/router.service';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -18,36 +19,31 @@ export default class ForgotPasswordComponent {
   private authService = inject(AuthService);
   private routerService = inject(RouterService);
   alertService = inject(AlertService);
+  private loadingService = inject(LoadingService);
 
-  public shouldResetForm = signal(false);
+  public shouldResetForm = this.authService.shouldResetForm;
 
   onForgotPassword(userData: FormDataConfig) {
     this.shouldResetForm.set(false);
-    const email: User = userData as User;
+    const email: UserLogin = userData as UserLogin;
     const emailToForgot = email.email;
+    this.loadingService.showLoading(true);
+
     try {
       this.authService.forgotPassword(emailToForgot).subscribe({
         next: (response) => {
-          this.alertService.setAlertMessage(response.message);
-          this.alertService.setAlertType('success');
-          this.alertService.showAlert(true);
-          setTimeout(() => {
-            this.routerService.navigateTo('/auth/login');
-          }, 2000);
+          this.authService.setErrors(response.message, 'success');
+          this.routerService.navigateTo('/auth/login');
         },
         error: (response) => {
-          this.setErrors(response);
+          this.authService.setErrors(response);
+        },
+        complete: () => {
+          this.loadingService.showLoading(false);
         },
       });
     } catch (error) {
       console.log(error);
     }
-  }
-
-  private setErrors(message: string = 'Forgot Password Error') {
-    this.alertService.setAlertMessage(message);
-    this.alertService.showAlert(true);
-    this.alertService.setAlertType('error');
-    this.shouldResetForm.set(true);
   }
 }
