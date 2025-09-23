@@ -1,6 +1,6 @@
 {
   "buildCommand": "node mynode.js && npm run build",
-  "outputDirectory": "dist/myPasswords",
+  "outputDirectory": "dist/myPasswords/browser",
   "framework": "angular",
   "routes": [
     {
