@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node mynode.js && npm run build",
+  "buildCommand": "node scripts/setEnvs.js && npm run build",
   "outputDirectory": "dist/myPasswords/browser",
   "framework": "angular",
   "routes": [
