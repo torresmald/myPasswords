@@ -9,7 +9,7 @@ require('dotenv').config();
 // Generate environment files content
 const generateEnvironment = (production = false) => `export const environment = {
   production: ${production},
-  API_URL: '${process.env.API_URL || (production ? 'https://your-api-production.com/api' : 'http://localhost:3000/api')}'
+  API_URL: '${process.env.API_URL_PROD || (production ? process.env.API_URL_PROD : process.env.API_URL_DEV)}'
 };
 `;
 
@@ -28,5 +28,5 @@ fs.writeFileSync(devTargetPath, devEnvFile);
 console.log(successColor, `${checkSign} Successfully generated environment.development.ts`);
 
 console.log('Environment files generated successfully!');
-console.log('Production API_URL:', process.env.API_URL || 'Using default');
+console.log('Production API_URL:', process.env.API_URL_PROD || 'Using default');
 console.log('Development API_URL: http://localhost:3000/api');
