@@ -15,8 +15,16 @@ if (!API_URL || !API_URL_PROD) {
   throw new Error('API URL not found')
 }
 
-const envFileContent = `
+const envFileContentProd = `
 export const environment = {
+  production: true,
+  API_URL: "${API_URL}",
+  API_URL_PROD: "${API_URL_PROD}"
+};
+`
+const envFileContentDev = `
+export const environment = {
+  production: false,
   API_URL: "${API_URL}",
   API_URL_PROD: "${API_URL_PROD}"
 };
@@ -25,6 +33,6 @@ const gitKeep = ``
 
 mkdirSync('./src/environments', {recursive: true})
 
-writeFileSync(targetPath, envFileContent)
+writeFileSync(targetPath, envFileContentProd)
 writeFileSync(targetGit, gitKeep)
-writeFileSync(targetPathDev, envFileContent)
+writeFileSync(targetPathDev, envFileContentDev)

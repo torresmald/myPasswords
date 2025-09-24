@@ -4,10 +4,11 @@
   "type": "module",
   "scripts": {
     "ng": "ng",
-    "start": "node -r dotenv/config mynode.js && ng serve",
+    "start": "node -r dotenv/config ./scripts/setEnvs.js && ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "setEnvs": "node ./scripts/setEnvs.js"
   },
   "prettier": {
     "printWidth": 100,
