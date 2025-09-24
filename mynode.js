@@ -1,32 +1,30 @@
-const fs = require('fs');
-const path = require('path');
-const successColor = '\x1b[32m%s\x1b[0m';
-const checkSign = '\u{2705}';
+import { writeFileSync, mkdirSync } from 'fs'
 
-// Load environment variables
-require('dotenv').config();
+import dotenv from 'dotenv'
 
-// Generate environment files content
-const generateEnvironment = (production = false) => `export const environment = {
-  production: ${production},
-  API_URL: '${process.env.API_URL_PROD || (production ? process.env.API_URL_PROD : process.env.API_URL_DEV)}'
+dotenv.config()
+
+const targetPath = './src/environments/environment.ts'
+const targetGit = './src/environments/.gitkeep'
+const targetPathDev = './src/environments/environment.development.ts'
+
+const API_URL = process.env['API_URL']
+const API_URL_PROD = process.env['API_URL_PROD']
+
+if (!API_URL || !API_URL_PROD) {
+  throw new Error('API URL not found')
+}
+
+const envFileContent = `
+export const environment = {
+  API_URL: "${API_URL}",
+  API_URL_PROD: "${API_URL_PROD}"
 };
-`;
+`
+const gitKeep = ``
 
-// Generate production environment
-const prodEnvFile = generateEnvironment(true);
-const prodTargetPath = path.join(__dirname, './src/environments/environment.ts');
+mkdirSync('./src/environments', {recursive: true})
 
-fs.writeFileSync(prodTargetPath, prodEnvFile);
-console.log(successColor, `${checkSign} Successfully generated environment.ts`);
-
-// Generate development environment
-const devEnvFile = generateEnvironment(false);
-const devTargetPath = path.join(__dirname, './src/environments/environment.development.ts');
-
-fs.writeFileSync(devTargetPath, devEnvFile);
-console.log(successColor, `${checkSign} Successfully generated environment.development.ts`);
-
-console.log('Environment files generated successfully!');
-console.log('Production API_URL:', process.env.API_URL_PROD || 'Using default');
-console.log('Development API_URL: http://localhost:3000/api');
+writeFileSync(targetPath, envFileContent)
+writeFileSync(targetGit, gitKeep)
+writeFileSync(targetPathDev, envFileContent)
