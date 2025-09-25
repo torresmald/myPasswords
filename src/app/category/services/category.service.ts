@@ -43,10 +43,17 @@ export class CategoryService {
     );
   }
 
-  public deleteCategory(categoryId: string): Observable<{ message: string }> {
+  public deleteCategory(
+    categoryId: string
+  ): Observable<{ message: string; categories: Category[] }> {
     return this.http
-      .delete<{ message: string }>(`${environment.API_URL}/categories/delete/${categoryId}`)
-      .pipe(catchError((error) => throwError(() => error)));
+      .delete<{ message: string; categories: Category[] }>(
+        `${environment.API_URL}/categories/delete/${categoryId}`
+      )
+      .pipe(
+        tap((response) => this.categories$.set(response.categories)),
+        catchError((error) => throwError(() => error))
+      );
   }
 
   public prepareFormData(category: CreateCategory) {

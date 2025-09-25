@@ -67,10 +67,17 @@ export class PasswordsService {
       );
   }
 
-  public deletePassword(passwordId: string): Observable<{ message: string }> {
+  public deletePassword(
+    passwordId: string
+  ): Observable<{ message: string; passwords: Password[] }> {
     return this.http
-      .delete<{ message: string }>(`${environment.API_URL}/passwords/delete/${passwordId}`)
-      .pipe(catchError((error) => throwError(() => error)));
+      .delete<{ message: string; passwords: Password[] }>(
+        `${environment.API_URL}/passwords/delete/${passwordId}`
+      )
+      .pipe(
+        tap((response) => this.passwords$.set(response.passwords)),
+        catchError((error) => throwError(() => error))
+      );
   }
 
   // Método para limpiar al hacer logout
