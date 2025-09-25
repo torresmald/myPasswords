@@ -1,7 +1,8 @@
-import { ForgotPasswordReset, FormDataConfig } from '@/auth/interfaces';
+import { ForgotPasswordReset } from '@/auth/interfaces';
 import { AuthService } from '@/auth/services/auth.service';
 import { AuthFormComponent } from '@/shared/components/form/form';
 import { FORGOT_PASSWORD_RESET } from '@/shared/configs/form-configs';
+import { FormDataConfig } from '@/shared/interfaces/form-config.interface';
 import { LoadingService } from '@/shared/services/loading.service';
 import { RouterService } from '@/shared/services/router.service';
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';

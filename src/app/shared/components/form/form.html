@@ -2,7 +2,7 @@
   <div class="card w-96 bg-base-100 shadow-xl mt-20 mb-20">
     <form class="card-body" (ngSubmit)="onSubmit()" [formGroup]="myForm">
       <!-- Title slot -->
-      <h2 class="card-title">{{ title() || 'Form' }}</h2>
+      <h2 class="card-title text-center">{{ title() || 'Form' }}</h2>
 
       <!-- Fields container -->
       <div class="items-center mt-2">
@@ -114,7 +114,8 @@
       <!-- Submit button -->
       <div class="card-actions justify-end">
         <button
-          class="btn btn-primary w-full disabled:opacity-50"
+          class="btn w-full disabled:opacity-50"
+          [class]="submitButtonColor()"
           type="submit"
           [disabled]="isDisabledSubmitButton()"
         >

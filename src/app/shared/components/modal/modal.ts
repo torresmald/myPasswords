@@ -7,20 +7,25 @@ import {
   signal,
   effect,
 } from '@angular/core';
-import { CreatePassword, RequestPassword, ViewPassword } from '@/passwords/interfaces';
+import { CreatePassword, ViewPassword } from '@/passwords/interfaces';
 import { PasswordsService } from '@/passwords/services/passwords.service';
 import { CategoryService } from '@/category/services/category.service';
 import { CreateCategory } from '@/category/interfaces';
 import { AuthService } from '@/auth/services/auth.service';
 import { AuthFormComponent } from '@/shared/components/form/form';
-import { FormConfig, FormDataConfig, SelectOption } from '@/auth/interfaces';
 import {
   CREATE_PASSWORD_CONFIG,
   CREATE_CATEGORY_CONFIG,
   VIEW_PASSWORD_CONFIG,
+  DELETE_CONFIG,
 } from '@/shared/configs/form-configs';
 import { LoadingService } from '@/shared/services/loading.service';
 import { AlertService } from '@/shared/services/alert.service';
+import {
+  FormConfig,
+  FormDataConfig,
+  SelectOption,
+} from '@/shared/interfaces/form-config.interface';
 
 @Component({
   selector: 'app-modal',
@@ -49,6 +54,8 @@ export class ModalComponent {
   public checked = signal(false);
   private userId = computed(() => this.authService.getUser()?.id!);
   public password = this.modalService.password;
+  public passwordId = this.modalService.passwordId;
+  public categoryId = this.modalService.categoryId;
 
   private modalEffect = effect(() => {
     if (this.getModalType() === 'add-password') {
@@ -75,6 +82,10 @@ export class ModalComponent {
       case 'view-password':
         config = VIEW_PASSWORD_CONFIG;
         break;
+      case 'delete-password':
+      case 'delete-category':
+        config = DELETE_CONFIG;
+        break;
       default:
         config = CREATE_PASSWORD_CONFIG;
     }
@@ -91,14 +102,49 @@ export class ModalComponent {
         return 'Add Category';
       case 'view-password':
         return 'Request Code';
+      case 'delete-password':
+      case 'delete-category':
+        return 'Delete';
       default:
         return 'Submit';
     }
   });
 
+  public getSubmitButtonColor = computed(() => {
+    const modalType = this.getModalType();
+    switch (modalType) {
+      case 'delete-password':
+      case 'delete-category':
+        return 'btn-error';
+      default:
+        return 'btn-primary';
+    }
+  });
+
+  public onFormSubmit(formData: FormDataConfig) {
+    const modalType = this.getModalType();
+
+    switch (modalType) {
+      case 'add-password':
+        this.handlePasswordCreation(formData as CreatePassword);
+        break;
+      case 'add-category':
+        this.handleCategoryCreation(formData as CreateCategory);
+        break;
+      case 'view-password':
+        this.handleViewPassword(formData as ViewPassword);
+        break;
+      case 'delete-password':
+        this.handleDeletePassword();
+        break;
+      case 'delete-category':
+        this.handleDeleteCategory();
+        break;
+    }
+  }
+
   private getPasswordId() {
-    const passwordId = this.modalService.passwordId();
-    this.handleRequestPasswordCode(passwordId);
+    this.handleRequestPasswordCode(this.passwordId());
   }
 
   private loadCategoriesForPasswordForm(): void {
@@ -125,22 +171,6 @@ export class ModalComponent {
   public closeModal() {
     this.modalService.showModal(false);
     this.shouldResetForm$.set(true);
-  }
-
-  public onFormSubmit(formData: FormDataConfig) {
-    const modalType = this.getModalType();
-
-    switch (modalType) {
-      case 'add-password':
-        this.handlePasswordCreation(formData as CreatePassword);
-        break;
-      case 'add-category':
-        this.handleCategoryCreation(formData as CreateCategory);
-        break;
-      case 'view-password':
-        this.handleViewPassword(formData as ViewPassword);
-        break;
-    }
   }
 
   private handlePasswordCreation(password: CreatePassword) {
@@ -186,6 +216,42 @@ export class ModalComponent {
       this.passwordsService.requestPasswordCode(passwordId).subscribe({
         next: (response) => this.passwordsService.setErrors(response.message, 'success'),
         error: (error) => this.passwordsService.setErrors(error),
+        complete: () => this.loadingService.showLoading(false),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  public handleDeletePassword() {
+    this.loadingService.showLoading(true);
+    try {
+      this.passwordsService.deletePassword(this.passwordId()).subscribe({
+        next: (response) => {
+          this.passwordsService.setErrors(response.message, 'success');
+
+          this.modalService.resetModal();
+        },
+        error: (error) => this.passwordsService.setErrors(error),
+        complete: () => this.loadingService.showLoading(false),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  public handleDeleteCategory() {
+    this.loadingService.showLoading(true);
+    try {
+      this.categoryService.deleteCategory(this.categoryId()).subscribe({
+        next: (response) => {
+          this.passwordsService.setErrors(response.message, 'success');
+          this.modalService.resetModal();
+        },
+        error: (error) => {
+          this.passwordsService.setErrors(error);
+          this.modalService.resetModal();
+        },
         complete: () => this.loadingService.showLoading(false),
       });
     } catch (error) {

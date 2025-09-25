@@ -4,4 +4,6 @@ export type ModalType =
   | 'edit-password'
   | 'add-category'
   | 'update-data'
-  | 'view-password-data';
+  | 'view-password-data'
+  | 'delete-password'
+  | 'delete-category';

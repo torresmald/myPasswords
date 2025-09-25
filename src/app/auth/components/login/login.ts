@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthFormComponent } from '../../../shared/components/form/form';
 import { LOGIN_CONFIG } from '@/shared/configs/form-configs';
-import { FormDataConfig } from '@/auth/interfaces/form-config.interface';
 import { AuthService } from '@/auth/services/auth.service';
 import { RouterService } from '@/shared/services/router.service';
 import { AlertService } from '@/shared/services/alert.service';
 import { UserLogin } from '@/auth/interfaces/user.interface';
 import { LoadingService } from '@/shared/services/loading.service';
+import { FormDataConfig } from '@/shared/interfaces/form-config.interface';
 
 @Component({
   selector: 'app-login',

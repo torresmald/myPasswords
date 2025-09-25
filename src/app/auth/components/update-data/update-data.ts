@@ -1,7 +1,8 @@
-import { FormDataConfig, UpdateUser } from '@/auth/interfaces';
+import { UpdateUser } from '@/auth/interfaces';
 import { AuthService } from '@/auth/services/auth.service';
 import { AuthFormComponent } from '@/shared/components/form/form';
 import { UPDATE_DATA } from '@/shared/configs/form-configs';
+import { FormDataConfig } from '@/shared/interfaces/form-config.interface';
 import { ImageService } from '@/shared/services/image.service';
 import { LoadingService } from '@/shared/services/loading.service';
 import { RouterService } from '@/shared/services/router.service';

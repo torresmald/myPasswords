@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { RouterLink } from '@angular/router';
 import { AuthFormComponent } from '../../../shared/components/form/form';
 import { REGISTER_CONFIG } from '@/shared/configs/form-configs';
-import { FormDataConfig } from '@/auth/interfaces/form-config.interface';
 import { AuthService } from '@/auth/services/auth.service';
 import { UserRegister } from '@/auth/interfaces/user.interface';
 import { RouterService } from '@/shared/services/router.service';
 import { ImageService } from '@/shared/services/image.service';
 import { LoadingService } from '@/shared/services/loading.service';
+import { FormDataConfig } from '@/shared/interfaces/form-config.interface';
 
 @Component({
   selector: 'app-register',

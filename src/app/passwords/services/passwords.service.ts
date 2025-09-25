@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
-import { catchError, delay, map, Observable, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { Password, CreatePassword, CreatePasswordApiResponse, ViewPassword } from '../interfaces';
 import { AlertService } from '@/shared/services/alert.service';
 import { LoadingService } from '@/shared/services/loading.service';
@@ -25,7 +25,6 @@ export class PasswordsService {
 
   public getAllPasswords(userId: string): Observable<Password[]> {
     return this.http.post<Password[]>(`${environment.API_URL}/passwords/getAll`, { userId }).pipe(
-      delay(1000),
       tap((response) => {
         this.setPasswords(response);
       }),
@@ -38,24 +37,19 @@ export class PasswordsService {
       .post<{ message: string }>(`${environment.API_URL}/passwords/requestPasswordCode`, {
         idPassword,
       })
-      .pipe(
-        delay(1000),
-        catchError((error) => throwError(() => error))
-      );
+      .pipe(catchError((error) => throwError(() => error)));
   }
 
   public getPassword(data: ViewPassword): Observable<Password> {
-    return this.http.post<Password>(`${environment.API_URL}/passwords/getPassword`, data).pipe(
-      delay(1000),
-      catchError((error) => throwError(() => error))
-    );
+    return this.http
+      .post<Password>(`${environment.API_URL}/passwords/getPassword`, data)
+      .pipe(catchError((error) => throwError(() => error)));
   }
 
   public createPassword(password: CreatePassword): Observable<Password[]> {
     return this.http
       .post<CreatePasswordApiResponse>(`${environment.API_URL}/passwords/create`, password)
       .pipe(
-        delay(1000),
         map((response) => {
           const password: Password[] = [
             ...this.passwords(),
@@ -71,6 +65,12 @@ export class PasswordsService {
         }),
         catchError((error) => throwError(() => error))
       );
+  }
+
+  public deletePassword(passwordId: string): Observable<{ message: string }> {
+    return this.http
+      .delete<{ message: string }>(`${environment.API_URL}/passwords/delete/${passwordId}`)
+      .pipe(catchError((error) => throwError(() => error)));
   }
 
   // Método para limpiar al hacer logout

@@ -1,24 +1,22 @@
 <div class="bg-base-100 shadow-lg p-4">
   <div class="flex gap-2 items-center justify-around md:justify-between">
     <div class="flex flex-col gap-2">
-      <h2 class="text-lg font-bold">{{ password().name }}</h2>
-      <p class="badge badge-accent">{{ password().category.name }}</p>
+      <h2 class="text-lg font-bold">{{ category().name }}</h2>
     </div>
     <div class="w-32">
       <figure
         class="w-full h-32 bg-contain bg-center bg-no-repeat"
-        [style.background-image]="getCategoryBackgroundImage(password().category.image)"
+        [style.background-image]="getCategoryBackgroundImage(category().image)"
       ></figure>
     </div>
   </div>
 
   <div class="mt-4 flex justify-between gap-2 items-center">
-    <button class="btn btn-primary" (click)="showPassword()">Request Password Code</button>
     <div class="flex items-center gap-1">
-      <span class="tooltip cursor-pointer tooltip-primary" data-tip="Edit Password">
+      <span class="tooltip cursor-pointer tooltip-primary" data-tip="Edit Category">
         <app-icon name="edit" color="#1E90FF"></app-icon>
       </span>
-      <span class="tooltip cursor-pointer tooltip-error" data-tip="Delete Password" (click)="deletePassword()">
+      <span class="tooltip cursor-pointer tooltip-error" data-tip="Delete Category" (click)="deleteCategory()">
         <app-icon name="trash" color="#DC143C"></app-icon>
       </span>
     </div>

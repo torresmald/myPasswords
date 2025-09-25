@@ -1,21 +1,21 @@
 <app-navbar></app-navbar>
 <main class="container mx-auto">
   <div class="flex justify-end gap-2">
-    <button class="btn btn-primary hidden md:block my-2" (click)="addPassword()">
-      Add New Password
+    <button class="btn btn-primary hidden md:block my-2" (click)="addNewCategory()">
+      Add New Category
     </button>
-    <button class="btn btn-secondary hidden md:block my-2" (click)="manageCategories()">
-      Manage Categories
+    <button class="btn btn-secondary hidden md:block my-2" (click)="managePasswords()">
+      Manage Passwords
     </button>
   </div>
   <div
     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-4 mt-5"
   >
-    @for (password of passwords(); track password.id) {
-    <app-password [password]="password"></app-password>
+    @for (category of categories(); track category.id) {
+    <app-category [category]="category"></app-category>
     } @empty {
     <div class="col-span-full text-center">
-      <p class="text-gray-500">No passwords found</p>
+      <p class="text-gray-500">No categories found</p>
     </div>
     }
   </div>

@@ -9,8 +9,8 @@ import {
   effect,
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FormConfig, FormDataConfig } from '@/auth/interfaces/form-config.interface';
 import { ModalService } from '@/shared/services/modal.service';
+import { FormConfig, FormDataConfig } from '@/shared/interfaces/form-config.interface';
 
 @Component({
   selector: 'app-form',
@@ -23,6 +23,7 @@ export class AuthFormComponent implements OnInit {
   public config = input.required<FormConfig>();
   public title = input.required<string>();
   public submitButtonText = input.required<string>();
+  public submitButtonColor = input<string>('btn-primary');
   public isAuthForm = input.required<boolean>();
 
   public shouldResetForm = input.required<boolean>();
@@ -78,7 +79,7 @@ export class AuthFormComponent implements OnInit {
   public isDisabledSubmitButton(): boolean {
     const fields = this.config().fields;
     return (
-      !this.myForm.valid  &&
+      !this.myForm.valid &&
       fields.some((field) => {
         const control = this.myForm.get(field.name);
         return control && control.value.toString().trim() === '';

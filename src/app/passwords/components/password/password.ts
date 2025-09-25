@@ -2,10 +2,11 @@ import { Password } from '@/passwords/interfaces/password.interface';
 import { PasswordsService } from '@/passwords/services/passwords.service';
 import { ModalService } from '@/shared/services/modal.service';
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { IconComponent } from "@/shared/components/svg/icon";
 
 @Component({
   selector: 'app-password',
-  imports: [],
+  imports: [IconComponent],
   templateUrl: './password.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -15,6 +16,10 @@ export class PasswordComponent {
 
   public showPassword() {
     this.modalService.openViewPasswordModal(this.password().id);
+  }
+
+  public deletePassword() {
+    this.modalService.openDeletePassword(this.password().id);
   }
 
   public getCategoryBackgroundImage(categoryImage?: string): string {

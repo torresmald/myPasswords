@@ -10,12 +10,14 @@ export class ModalService {
   private title$ = signal('');
   private modalType$ = signal<ModalType | null>(null);
   private passwordId$ = signal<string>('');
+  private categoryId$ = signal<string>('');
   private password$ = signal<string>('');
 
   public modal = computed(() => this.modal$());
   public title = computed(() => this.title$());
   public modalType = computed(() => this.modalType$());
   public passwordId = computed(() => this.passwordId$());
+  public categoryId = computed(() => this.categoryId$());
   public password = computed(() => this.password$());
 
   public showModal(condition: boolean = false) {
@@ -23,7 +25,10 @@ export class ModalService {
 
     // Si se cierra el modal, limpiar datos
     if (!condition) {
-      this.resetModal();
+      this.setTitle('');
+      this.setModalType(null);
+      this.passwordId$.set('');
+      this.password$.set('');
     }
   }
 
@@ -64,11 +69,26 @@ export class ModalService {
     this.showModal(true);
   }
 
+  public openDeletePassword(passwordId: string) {
+    this.setTitle('Are you sure you want to delete the Password?');
+    this.setModalType('delete-password');
+    this.passwordId$.set(passwordId);
+    this.showModal(true);
+  }
+
+  public openDeleteCategory(categoryId: string) {
+    this.setTitle('Are you sure you want to delete the Category?');
+    this.setModalType('delete-category');
+    this.categoryId$.set(categoryId);
+    this.showModal(true);
+  }
+
   public resetModal() {
     this.setTitle('');
     this.setModalType(null);
     this.showModal(false);
     this.passwordId$.set('');
+    this.password$.set('');
     this.password$.set('');
   }
 }

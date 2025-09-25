@@ -1,7 +1,8 @@
-import { FormDataConfig, UserLogin } from '@/auth/interfaces';
+import {  UserLogin } from '@/auth/interfaces';
 import { AuthService } from '@/auth/services/auth.service';
 import { AuthFormComponent } from '@/shared/components/form/form';
 import { FORGOT_PASSWORD } from '@/shared/configs/form-configs';
+import { FormDataConfig } from '@/shared/interfaces/form-config.interface';
 import { AlertService } from '@/shared/services/alert.service';
 import { LoadingService } from '@/shared/services/loading.service';
 import { RouterService } from '@/shared/services/router.service';

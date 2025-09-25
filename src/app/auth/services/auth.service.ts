@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { catchError, delay, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import {
   AuthStatus,
   ForgotPassword,
@@ -31,7 +31,7 @@ export class AuthService {
   public shouldResetForm = signal(false);
   private authStatus = signal<AuthStatus>('checking');
   private user = signal<UserApi | null>(null);
-  private token = signal<string | null>(localStorage.getItem('token'));
+  private token = signal<string | null>(localStorage.getItem('myPasswordToken'));
   public getToken = computed<string | null>(() => this.token());
   public getUser = computed<UserApi | null>(() => this.user());
 
@@ -43,7 +43,6 @@ export class AuthService {
 
   public register(user: FormData): Observable<UserApi> {
     return this.http.post<UserApi>(`${environment.API_URL}/auth/register`, user).pipe(
-      delay(1000),
       map((user) => this.setResponses('authenticated', user)),
       catchError((error: Error) => {
         this.logout();
@@ -54,7 +53,6 @@ export class AuthService {
 
   public login(user: UserLogin): Observable<UserApi> {
     return this.http.post<UserApi>(`${environment.API_URL}/auth/login`, user).pipe(
-      delay(1000),
       map((user) => {
         return this.setResponses('authenticated', user);
       }),
@@ -66,13 +64,12 @@ export class AuthService {
   }
 
   public isValidToken(): Observable<UserApi> {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('myPasswordToken');
     if (!token) {
       this.logout();
       return of();
     }
     return this.http.get<UserApi>(`${environment.API_URL}/auth/check-token`).pipe(
-      delay(1000),
       tap((user) => this.setResponses('authenticated', user)),
       map((user) => user),
       catchError((error: any) => {
@@ -83,19 +80,15 @@ export class AuthService {
   }
 
   public confirmAccount(token: string): Observable<UserApi> {
-    return this.http.post<UserApi>(`${environment.API_URL}/auth/confirm-account`, { token }).pipe(
-      delay(1000),
-      catchError((error) => throwError(() => error))
-    );
+    return this.http
+      .post<UserApi>(`${environment.API_URL}/auth/confirm-account`, { token })
+      .pipe(catchError((error) => throwError(() => error)));
   }
 
   public forgotPassword(email: string): Observable<ForgotPassword> {
     return this.http
       .post<ForgotPassword>(`${environment.API_URL}/auth/forgot-password`, { email })
-      .pipe(
-        delay(1000),
-        catchError((error) => throwError(() => error))
-      );
+      .pipe(catchError((error) => throwError(() => error)));
   }
 
   public forgotPasswordReset(
@@ -106,24 +99,20 @@ export class AuthService {
         `${environment.API_URL}/auth/forgot-password-reset`,
         forgotPasswordConfig
       )
-      .pipe(
-        delay(1000),
-        catchError((error) => throwError(() => error))
-      );
+      .pipe(catchError((error) => throwError(() => error)));
   }
 
   public updateUserData(updateUserData: FormData): Observable<ForgotPassword> {
-    return this.http.put<ForgotPassword>(`${environment.API_URL}/auth/update`, updateUserData).pipe(
-      delay(1000),
-      catchError((error) => throwError(() => error))
-    );
+    return this.http
+      .put<ForgotPassword>(`${environment.API_URL}/auth/update`, updateUserData)
+      .pipe(catchError((error) => throwError(() => error)));
   }
 
   public setResponses(authStatus: AuthStatus, user: UserApi): UserApi {
     this.authStatus.set(authStatus);
     this.user.set(user);
     this.token.set(user.token);
-    localStorage.setItem('token', user.token);
+    localStorage.setItem('myPasswordToken', user.token);
     return user;
   }
 
@@ -131,9 +120,9 @@ export class AuthService {
     this.authStatus.set('not-authenticated');
     this.user.set(null);
     this.token.set(null);
-    localStorage.removeItem('token');
+    localStorage.removeItem('myPasswordToken');
     this.passwordsService.clearPasswords();
-    this.routerService.navigateTo('/auth/login');
+    this.routerService.navigateTo('/home');
   }
 
   public prepareFormData(user: UserRegister) {

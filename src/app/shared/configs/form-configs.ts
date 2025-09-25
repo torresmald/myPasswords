@@ -1,6 +1,6 @@
 import { Validators } from '@angular/forms';
-import { FormConfig } from '@/auth/interfaces/form-config.interface';
 import { FormHelpers } from '@auth/helpers/form.helpers';
+import { FormConfig } from '../interfaces/form-config.interface';
 
 export const LOGIN_CONFIG: FormConfig = {
   fields: [
@@ -182,4 +182,8 @@ export const UPDATE_DATA: FormConfig = {
     },
   ],
   validators: FormHelpers.isField1DifferentField2('password', 'repeatPassword'),
+};
+
+export const DELETE_CONFIG: FormConfig = {
+  fields: [],
 };

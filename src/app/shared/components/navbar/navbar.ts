@@ -13,7 +13,7 @@ export class NavbarComponent {
   private authService = inject(AuthService);
   private routerService = inject(RouterService);
 
-  public user = this.authService.getUser
+  public user = this.authService.getUser;
 
   public logout() {
     this.authService.logout();
@@ -25,8 +25,14 @@ export class NavbarComponent {
     this.modalService.openAddPasswordModal();
   }
 
-  public addCategory() {
-    this.modalService.openAddCategoryModal();
+  public manageCategories() {
+    this.routerService.navigateTo('/categories');
+
+    //this.modalService.openAddCategoryModal();
+  }
+
+  public managePasswords() {
+    this.routerService.navigateTo('/passwords');
   }
 
   public updateData() {

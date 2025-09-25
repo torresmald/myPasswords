@@ -1,44 +1,44 @@
 import { AuthService } from '@/auth/services/auth.service';
-import { PasswordComponent } from '@/passwords/components/password/password';
+import { CategoryComponent } from '@/category/components/category/category';
+import { CategoryService } from '@/category/services/category.service';
 import { PasswordsService } from '@/passwords/services/passwords.service';
-import { NavbarComponent } from '@/shared/components/navbar/navbar';
-import { ChangeDetectionStrategy, Component, inject, computed, effect } from '@angular/core';
 import { ModalComponent } from '@/shared/components/modal/modal';
+import { NavbarComponent } from '@/shared/components/navbar/navbar';
 import { ModalService } from '@/shared/services/modal.service';
 import { RouterService } from '@/shared/services/router.service';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 
 @Component({
-  selector: 'app-passwords-page',
-  imports: [PasswordComponent, NavbarComponent, ModalComponent],
-  templateUrl: './passwords-page.html',
+  selector: 'app-category-page',
+  imports: [NavbarComponent, CategoryComponent, ModalComponent],
+  templateUrl: './category-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class PasswordsPageComponent {
-  private passwordsService = inject(PasswordsService);
+export default class CategoryPageComponent {
+  private routerService = inject(RouterService);
+  public addNewCategory() {}
+
+  public managePasswords() {
+    this.routerService.navigateTo('/passwords');
+  }
+
+  private categoryService = inject(CategoryService);
   private authService = inject(AuthService);
   private modalService = inject(ModalService);
-  private routerService = inject(RouterService);
 
   // Computed para verificar si el usuario está listo
   private isUserReady = computed(() => {
     return this.authService.getUser() && this.authService.getAuthStatus() === 'authenticated';
   });
 
-  public passwords = computed(() => this.passwordsService.passwords());
+  public categories = computed(() => this.categoryService.categories());
   public modal = computed(() => this.modalService.modal());
 
-  public passwordsEffect = effect(() => {
+  public categoriesEffect = effect(() => {
     if (this.isUserReady()) {
-      const user = this.authService.getUser();
-      if (user?.id) {
-        this.passwordsService.getAllPasswords(user.id).subscribe();
-      }
+      this.categoryService.getAllCategories().subscribe();
     }
   });
-
-  public addPassword() {
-    this.modalService.openAddPasswordModal();
-  }
 
   public manageCategories() {
     //this.modalService.openAddCategoryModal();
