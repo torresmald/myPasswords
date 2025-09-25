@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { Category, CreateCategory } from '../interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ImageService } from '@/shared/services/image.service';
@@ -25,10 +25,22 @@ export class CategoryService {
     );
   }
 
-  public createCategory(formData: FormData): Observable<Category> {
-    return this.http
-      .post<Category>(`${environment.API_URL}/categories/create`, formData)
-      .pipe(catchError((error) => throwError(() => error)));
+  public createCategory(formData: FormData): Observable<Category[]> {
+    return this.http.post<Category>(`${environment.API_URL}/categories/create`, formData).pipe(
+      map((response) => {
+        const category: Category[] = [
+          ...this.categories(),
+          {
+            id: response.id,
+            name: response.name,
+            user: response.user,
+          },
+        ];
+        this.setCategories(category);
+        return category;
+      }),
+      catchError((error) => throwError(() => error))
+    );
   }
 
   public deleteCategory(categoryId: string): Observable<{ message: string }> {

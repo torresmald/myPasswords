@@ -198,7 +198,7 @@ export class ModalComponent {
     const formData = this.categoryService.prepareFormData(category);
     this.categoryService.createCategory(formData).subscribe({
       next: (response) => {
-        this.passwordsService.setErrors('Category Created');
+        this.passwordsService.setErrors('Category Created', 'success');
         this.modalService.showModal(false);
       },
       error: (error) => {
