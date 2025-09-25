@@ -25,10 +25,12 @@ export class NavbarComponent {
     this.modalService.openAddPasswordModal();
   }
 
+  public addCategory() {
+    this.modalService.openAddCategoryModal();
+  }
+
   public manageCategories() {
     this.routerService.navigateTo('/categories');
-
-    //this.modalService.openAddCategoryModal();
   }
 
   public managePasswords() {

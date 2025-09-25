@@ -1,7 +1,7 @@
 <nav class="navbar bg-base-100 shadow-sm flex justify-between items-center">
   <h1 class="text-xl font-bold ml-2">MyPasswords</h1>
   <div class="flex gap-8 items-center">
-    <p class="text-sm">Welcome,
+    <p class="text-sm hidden md:block">Welcome,
       <span class="font-bold">{{ user()?.name }}</span>
     </p>
     <div class="dropdown dropdown-end">
@@ -16,6 +16,7 @@
       >
         <li><a (click)="updateData()">Update Data</a></li>
         <li><a (click)="addPassword()">Add New Password</a></li>
+        <li><a (click)="addCategory()">Add New Category</a></li>
         <li><a (click)="manageCategories()">Manage Categories</a></li>
         <li><a (click)="managePasswords()">Manage Passwords</a></li>
         <li><a (click)="logout()">Logout</a></li>
