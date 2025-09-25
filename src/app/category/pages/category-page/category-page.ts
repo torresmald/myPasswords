@@ -16,11 +16,6 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@a
 })
 export default class CategoryPageComponent {
   private routerService = inject(RouterService);
-  public addNewCategory() {}
-
-  public managePasswords() {
-    this.routerService.navigateTo('/passwords');
-  }
 
   private categoryService = inject(CategoryService);
   private authService = inject(AuthService);
@@ -40,8 +35,11 @@ export default class CategoryPageComponent {
     }
   });
 
-  public manageCategories() {
-    //this.modalService.openAddCategoryModal();
-    this.routerService.navigateTo('/categories');
+  public addNewCategory() {
+    this.modalService.openAddCategoryModal();
+  }
+
+  public managePasswords() {
+    this.routerService.navigateTo('/passwords');
   }
 }
