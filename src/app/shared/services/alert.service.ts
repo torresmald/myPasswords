@@ -14,9 +14,9 @@ export class AlertService {
 
   public showAlert(condition: boolean) {
     this.alert$.set(condition);
-    setTimeout(() => {
-      this.alert$.set(!condition);
-    }, 3000);
+    // setTimeout(() => {
+    //   this.alert$.set(!condition);
+    // }, 3000);
   }
 
   public setAlertMessage(message: string) {
