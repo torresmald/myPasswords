@@ -1,28 +1,43 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
-import { Category, CreateCategory, UpdateCategory } from '../interfaces';
+import {
+  Category,
+  CategoryApiResponse,
+  CreateCategory,
+  PaginationData,
+  UpdateCategory,
+} from '../interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ImageService } from '@/shared/services/image.service';
+import { PaginationService } from '@/shared/services/pagination.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoryService {
-  constructor() {
-    this.getAllCategories().subscribe();
-  }
   private http = inject(HttpClient);
   private imageService = inject(ImageService);
+  private paginationService = inject(PaginationService);
 
   private categories$ = signal<Category[]>([]);
   public categories = this.categories$.asReadonly();
 
-  public getAllCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${environment.API_URL}/categories/getAll`).pipe(
-      tap((response) => this.categories$.set(response)),
-      catchError((error) => throwError(() => error))
-    );
+  public getAllCategories(page: number = 1, limit: number = 10): Observable<CategoryApiResponse> {
+    if (page < 0) {
+      page = 1;
+    }
+    return this.http
+      .get<CategoryApiResponse>(
+        `${environment.API_URL}/categories/getAll?page=${page}&limit=${limit}`
+      )
+      .pipe(
+        tap((response) => {
+          this.categories$.set(response.data);
+          this.paginationService.setPaginationDataCategory(response.pagination);
+        }),
+        catchError((error) => throwError(() => error))
+      );
   }
 
   public createCategory(formData: FormData): Observable<Category[]> {
@@ -65,9 +80,7 @@ export class CategoryService {
       .pipe(
         tap((response) => {
           this.categories$.update((oldCategories) =>
-            oldCategories.map(cat =>
-              cat.id === response.category.id ? response.category : cat
-            )
+            oldCategories.map((cat) => (cat.id === response.category.id ? response.category : cat))
           );
         }),
         catchError((error) => throwError(() => error))

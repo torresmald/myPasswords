@@ -1,4 +1,4 @@
-<app-shared-page>
+<app-shared-page [page]="page()!" [paginationData]="paginationData()!" [route]="'/categories'">
   <ng-container add-button>
     <button class="btn btn-primary" (click)="addNewCategory()">Add New Category</button>
   </ng-container>
@@ -18,19 +18,19 @@
 
   <ng-container item>
     @for (category of categories(); track category.id) {
-      <app-category [category]="category"></app-category>
+    <app-category [category]="category"></app-category>
     }
   </ng-container>
 
   <ng-container empty>
     @if (categories().length === 0) {
-      <div class="col-span-full text-center py-12">
-        <app-icon name="list" size="64" customClass="text-gray-300 mx-auto mb-4"></app-icon>
-        <p class="text-gray-500 text-lg">No categories found</p>
-        <button class="btn btn-primary mt-4" (click)="addNewCategory()">
-          Create your first category
-        </button>
-      </div>
+    <div class="col-span-full text-center py-12">
+      <app-icon name="list" size="64" customClass="text-gray-300 mx-auto mb-4"></app-icon>
+      <p class="text-gray-500 text-lg">No categories found</p>
+      <button class="btn btn-primary mt-4" (click)="addNewCategory()">
+        Create your first category
+      </button>
+    </div>
     }
   </ng-container>
 </app-shared-page>

@@ -1,5 +1,5 @@
 import { UserApi } from '@/auth/interfaces';
-import { Category } from '../../category/interfaces/category.interface';
+import { Category, PaginationData } from '../../category/interfaces/category.interface';
 
 export interface Password {
   id: string;
@@ -9,3 +9,7 @@ export interface Password {
   user: UserApi;
 }
 
+export interface PasswordApiResponse {
+  data: Password[];
+  pagination: PaginationData;
+}

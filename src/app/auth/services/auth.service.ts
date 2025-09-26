@@ -10,7 +10,6 @@ import {
   UserApi,
   UserRegister,
 } from '../interfaces';
-import { PasswordsService } from '@/passwords/services/passwords.service';
 import { RouterService } from '@/shared/services/router.service';
 import { ImageService } from '@/shared/services/image.service';
 import { AlertService } from '@/shared/services/alert.service';
@@ -22,7 +21,6 @@ import { environment } from '../../../environments/environment';
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private passwordsService = inject(PasswordsService);
   private routerService = inject(RouterService);
   private imageService = inject(ImageService);
   private alertService = inject(AlertService);

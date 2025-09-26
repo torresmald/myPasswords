@@ -9,33 +9,42 @@ import {
   CreatePasswordApiResponse,
   ViewPassword,
   UpdatePassword,
+  PasswordApiResponse,
 } from '../interfaces';
 import { AlertService } from '@/shared/services/alert.service';
 import { LoadingService } from '@/shared/services/loading.service';
+import { PaginationData } from '@/category/interfaces';
+import { PaginationService } from '@/shared/services/pagination.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PasswordsService {
-  constructor() {
-    this.getAllPasswords().subscribe();
-  }
   private http = inject(HttpClient);
   private alertService = inject(AlertService);
   private loadingService = inject(LoadingService);
+  private paginationService = inject(PaginationService);
 
   private passwords$ = signal<Password[]>([]);
   public passwords = this.passwords$.asReadonly();
-
+  public paginationData = this.paginationService.paginationDataPassword;
   public shouldResetForm = signal(false);
 
-  public getAllPasswords(): Observable<Password[]> {
-    return this.http.get<Password[]>(`${environment.API_URL}/passwords/getAll`).pipe(
-      tap((response) => {
-        this.passwords$.set(response);
-      }),
-      catchError((error) => throwError(() => error))
-    );
+  public getAllPasswords(page: number = 1, limit: number = 10): Observable<PasswordApiResponse> {
+    if (page < 0) {
+      page = 1;
+    }
+    return this.http
+      .get<PasswordApiResponse>(
+        `${environment.API_URL}/passwords/getAll?page=${page}&limit=${limit}`
+      )
+      .pipe(
+        tap((response) => {
+          this.passwords$.set(response.data);
+          this.paginationService.setPaginationDataPassword(response.pagination);
+        }),
+        catchError((error) => throwError(() => error))
+      );
   }
 
   public requestPasswordCode(idPassword: string): Observable<{ message: string }> {
@@ -53,7 +62,6 @@ export class PasswordsService {
   }
 
   public createPassword(password: CreatePassword): Observable<Password[]> {
-
     return this.http
       .post<CreatePasswordApiResponse>(`${environment.API_URL}/passwords/create`, password)
       .pipe(

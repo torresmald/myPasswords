@@ -1,10 +1,11 @@
 import { PasswordComponent } from '@/passwords/components/password/password';
 import { PasswordsService } from '@/passwords/services/passwords.service';
 import { IconComponent } from '@/shared/components/svg/icon';
-import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { ModalService } from '@/shared/services/modal.service';
 import { RouterService } from '@/shared/services/router.service';
 import { SharedPageComponent } from '@/shared/pages/shared-page/shared-page';
+import { PaginationService } from '@/shared/services/pagination.service';
 
 @Component({
   selector: 'app-passwords-page',
@@ -16,15 +17,23 @@ export default class PasswordsPageComponent {
   private passwordsService = inject(PasswordsService);
   private modalService = inject(ModalService);
   private routerService = inject(RouterService);
+  private paginationService = inject(PaginationService);
 
   public passwords = this.passwordsService.passwords;
-  public modal = computed(() => this.modalService.modal());
+  public modal = this.modalService.modal;
+  public page = this.paginationService.page;
+
+  protected paginationData = this.paginationService.paginationDataPassword;
+
+  protected pageChanged = effect(() => {
+    this.passwordsService.getAllPasswords(this.page()).subscribe();
+  });
 
   public addPassword() {
     this.modalService.openAddPasswordModal();
   }
 
   public manageCategories() {
-    this.routerService.navigateTo('/categories');
+    this.routerService.navigateTo('/categories?page=1');
   }
 }

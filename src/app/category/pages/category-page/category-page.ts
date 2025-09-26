@@ -4,7 +4,8 @@ import { SharedPageComponent } from '@/shared/pages/shared-page/shared-page';
 import { IconComponent } from '@/shared/components/svg/icon';
 import { ModalService } from '@/shared/services/modal.service';
 import { RouterService } from '@/shared/services/router.service';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { PaginationService } from '@/shared/services/pagination.service';
 
 @Component({
   selector: 'app-category-page',
@@ -14,18 +15,26 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 })
 export default class CategoryPageComponent {
   private routerService = inject(RouterService);
-
   private categoryService = inject(CategoryService);
   private modalService = inject(ModalService);
+  private paginationService = inject(PaginationService);
 
   protected categories = this.categoryService.categories;
-  protected modal = computed(() => this.modalService.modal());
+  protected modal = this.modalService.modal;
+
+  protected paginationData = this.paginationService.paginationDataCategoy;
+
+  public page = this.paginationService.page;
+
+  protected pageChanged = effect(() => {
+    this.categoryService.getAllCategories(this.page()).subscribe();
+  });
 
   protected addNewCategory() {
     this.modalService.openAddCategoryModal();
   }
 
   protected managePasswords() {
-    this.routerService.navigateTo('/passwords');
+    this.routerService.navigateTo('/passwords?page=1');
   }
 }

@@ -8,6 +8,7 @@ export interface UserRegister {
   password: string
   name: string
   image: File
+ // sendWhatsapp?: boolean
 }
 
 

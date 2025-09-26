@@ -7,7 +7,7 @@ import { ICON_MAP } from './icon-map';
   imports: [],
   template: `
     <div
-      class="inline-flex items-center justify-center {{ customClass() }}"
+      class="inline-flex  {{ customClass() }}"
       [style.width.px]="size()"
       [style.height.px]="size()"
       [style.color]="color()"

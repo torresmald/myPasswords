@@ -1,21 +1,81 @@
-<app-navbar></app-navbar>
-<main class="container mx-auto px-4">
-  <div class="flex justify-end gap-2 my-4">
-    <div class="hidden md:flex gap-2">
-      <ng-content select="[add-button]"></ng-content>
-      <ng-content select="[manage-button]"></ng-content>
-    </div>
-    <div class="md:hidden flex gap-2">
-      <ng-content select="[mobile-buttons]"></ng-content>
-    </div>
-  </div>
+<div class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <app-navbar></app-navbar>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-5">
-    <ng-content select="[item]"></ng-content>
-    <ng-content select="[empty]"></ng-content>
-  </div>
+  <main class="flex-1 container mx-auto px-4">
+    <div class="flex justify-between gap-2 my-4">
+      <!-- Desktop buttons -->
+      <div class="hidden md:flex gap-2 ml-auto">
+        <ng-content select="[add-button]"></ng-content>
+        <ng-content select="[manage-button]"></ng-content>
+      </div>
 
-  @if (modal()) {
+      <!-- Mobile: Pagination buttons + action buttons -->
+      <div class="md:hidden flex justify-between items-center w-full gap-2">
+        @if (paginationData()?.hasPreviousPage || paginationData()?.hasNextPage) {
+        <div class="flex gap-1">
+          <app-button
+            [disabled]="!paginationData()?.hasPreviousPage"
+            [variant]="'secondary'"
+            [size]="'sm'"
+            [routerLink]="[route()]"
+            [queryParams]="{ page: page() - 1 }"
+            [queryParamsHandling]="'merge'"
+            >Previous</app-button
+          >
+          <app-button
+            [disabled]="!paginationData()?.hasNextPage"
+            [variant]="'secondary'"
+            [size]="'sm'"
+            [routerLink]="[route()]"
+            [queryParams]="{ page: page() + 1 }"
+            [queryParamsHandling]="'merge'"
+            >Next</app-button
+          >
+        </div>
+        }
+
+        <div class="flex gap-2">
+          <ng-content select="[mobile-buttons]"></ng-content>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-5 mb-8">
+      <ng-content select="[item]"></ng-content>
+      <ng-content select="[empty]"></ng-content>
+    </div>
+
+    <!-- Desktop pagination -->
+    @if (paginationData()?.hasPreviousPage || paginationData()?.hasNextPage) {
+    <div class="hidden md:flex justify-center my-8 gap-4">
+      <app-button
+        [disabled]="!paginationData()?.hasPreviousPage"
+        [variant]="'secondary'"
+        [size]="'md'"
+        [routerLink]="[route()]"
+        [queryParams]="{ page: page() - 1 }"
+        [queryParamsHandling]="'merge'"
+        >Previous</app-button
+      >
+      <app-button
+        [disabled]="!paginationData()?.hasNextPage"
+        [variant]="'secondary'"
+        [size]="'md'"
+        [routerLink]="[route()]"
+        [queryParams]="{ page: page() + 1 }"
+        [queryParamsHandling]="'merge'"
+        >Next</app-button
+      >
+    </div>
+    }
+
+    @if (modal()) {
     <app-modal></app-modal>
-  }
-</main>
+    }
+  </main>
+
+  <!-- Footer sticky -->
+  <app-footer></app-footer>
+</div>

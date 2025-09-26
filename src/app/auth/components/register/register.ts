@@ -22,6 +22,7 @@ export default class RegisterComponent {
   private loadingService = inject(LoadingService);
   private imageService = inject(ImageService);
   public checked = signal(false);
+//  public checkedWhatsapp = signal(false);
 
   public shouldResetForm = this.authService.shouldResetForm;
 
@@ -29,7 +30,6 @@ export default class RegisterComponent {
     const { repeatPassword, ...userData } = formData;
     const user: UserRegister = userData as UserRegister;
     const formDataToSend = this.authService.prepareFormData(user);
-
     try {
       this.loadingService.showLoading(true);
 
