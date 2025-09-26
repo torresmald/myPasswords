@@ -84,7 +84,7 @@ export const CREATE_PASSWORD_CONFIG: FormConfig = {
       validators: [Validators.required],
     },
     {
-      name: 'idCategory',
+      name: 'categoryId',
       type: 'select',
       placeholder: 'Select category',
       autocomplete: 'category',
@@ -182,6 +182,45 @@ export const UPDATE_DATA: FormConfig = {
     },
   ],
   validators: FormHelpers.isField1DifferentField2('password', 'repeatPassword'),
+};
+
+export const UPDATE_DATA_CATEGORY: FormConfig = {
+  fields: [
+    {
+      name: 'name',
+      type: 'text',
+      placeholder: 'Name',
+      autocomplete: 'name',
+      validators: [Validators.minLength(3)],
+    },
+  ],
+};
+
+export const UPDATE_DATA_PASSWORD: FormConfig = {
+  fields: [
+    {
+      name: 'name',
+      type: 'text',
+      placeholder: 'Name',
+      autocomplete: 'name',
+      validators: [Validators.minLength(3)],
+    },
+    {
+      name: 'password',
+      type: 'password',
+      placeholder: 'Password',
+      autocomplete: 'off',
+      validators: [],
+    },
+    {
+      name: 'categoryId',
+      type: 'select',
+      placeholder: 'Select category',
+      autocomplete: 'category',
+      validators: [Validators.required],
+      options: [],
+    },
+  ],
 };
 
 export const DELETE_CONFIG: FormConfig = {

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, Observable, of, tap, throwError } from 'rxjs';
 import {
   AuthStatus,
   ForgotPassword,
@@ -32,8 +32,8 @@ export class AuthService {
   private authStatus = signal<AuthStatus>('checking');
   private user = signal<UserApi | null>(null);
   private token = signal<string | null>(localStorage.getItem('myPasswordToken'));
-  public getToken = computed<string | null>(() => this.token());
-  public getUser = computed<UserApi | null>(() => this.user());
+  public getToken = this.token.asReadonly();
+  public getUser = this.user.asReadonly();
 
   public getAuthStatus = computed<AuthStatus>(() => {
     if (this.authStatus() === 'checking') return 'checking';
@@ -43,7 +43,7 @@ export class AuthService {
 
   public register(user: FormData): Observable<UserApi> {
     return this.http.post<UserApi>(`${environment.API_URL}/auth/register`, user).pipe(
-      map((user) => this.setResponses('authenticated', user)),
+      tap((user) => this.setResponses('authenticated', user)),
       catchError((error: Error) => {
         this.logout();
         return throwError(() => error);
@@ -53,9 +53,7 @@ export class AuthService {
 
   public login(user: UserLogin): Observable<UserApi> {
     return this.http.post<UserApi>(`${environment.API_URL}/auth/login`, user).pipe(
-      map((user) => {
-        return this.setResponses('authenticated', user);
-      }),
+      tap((user) => this.setResponses('authenticated', user)),
       catchError((error: any) => {
         this.logout();
         return throwError(() => error);
@@ -70,8 +68,9 @@ export class AuthService {
       return of();
     }
     return this.http.get<UserApi>(`${environment.API_URL}/auth/check-token`).pipe(
-      tap((user) => this.setResponses('authenticated', user)),
-      map((user) => user),
+      tap((user) => {
+        this.setResponses('authenticated', user);
+      }),
       catchError((error: any) => {
         this.logout();
         return throwError(() => error);
@@ -121,31 +120,28 @@ export class AuthService {
     this.user.set(null);
     this.token.set(null);
     localStorage.removeItem('myPasswordToken');
-    this.passwordsService.clearPasswords();
     this.routerService.navigateTo('/home');
   }
 
-  public prepareFormData(user: UserRegister) {
+  public prepareFormData(userData: UserRegister | UpdateUser) {
     const formData = new FormData();
-    formData.append('name', user.name);
-    formData.append('email', user.email);
-    formData.append('password', user.password);
-    if (this.imageService.imageCategoryBase64() != null) {
-      user.image = this.imageService.imageCategoryBase64()!;
-      formData.append('image', user.image);
+    formData.append('name', userData.name);
+    formData.append('password', userData.password);
+    if ('email' in userData) {
+      formData.append('email', userData.email);
+    } else {
+      formData.append('token', userData.token);
     }
-    return formData;
-  }
+    if (this.imageService.imageCategoryBase64() != null) {
+      const imageBase64 = this.imageService.imageCategoryBase64()!;
+      formData.append('image', imageBase64);
+      if ('email' in userData) {
+        (userData as UserRegister).image = imageBase64;
+      } else {
+        (userData as UpdateUser).image = imageBase64;
+      }
+    }
 
-  public prepareFormDataUpdate(userUpdated: UpdateUser) {
-    const formData = new FormData();
-    formData.append('name', userUpdated.name);
-    formData.append('password', userUpdated.password);
-    formData.append('token', userUpdated.token);
-    if (this.imageService.imageCategoryBase64() != null) {
-      userUpdated.image = this.imageService.imageCategoryBase64()!;
-      formData.append('image', userUpdated.image);
-    }
     return formData;
   }
 

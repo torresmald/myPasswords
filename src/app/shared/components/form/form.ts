@@ -90,6 +90,7 @@ export class AuthFormComponent implements OnInit {
   public onSubmit() {
     this.myForm.markAllAsTouched();
     if (this.myForm.valid) {
+
       this.formSubmit.emit(this.myForm.value);
     }
   }

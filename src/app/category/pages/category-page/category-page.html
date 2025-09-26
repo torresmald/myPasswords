@@ -1,25 +1,36 @@
-<app-navbar></app-navbar>
-<main class="container mx-auto">
-  <div class="flex justify-end gap-2">
-    <button class="btn btn-primary hidden md:block my-2" (click)="addNewCategory()">
-      Add New Category
+<app-shared-page>
+  <ng-container add-button>
+    <button class="btn btn-primary" (click)="addNewCategory()">Add New Category</button>
+  </ng-container>
+
+  <ng-container manage-button>
+    <button class="btn btn-secondary" (click)="managePasswords()">Manage Passwords</button>
+  </ng-container>
+
+  <ng-container mobile-buttons>
+    <button class="btn btn-primary btn-sm" (click)="addNewCategory()">
+      <app-icon name="plus" size="16"></app-icon>
     </button>
-    <button class="btn btn-secondary hidden md:block my-2" (click)="managePasswords()">
-      Manage Passwords
+    <button class="btn btn-secondary btn-sm" (click)="managePasswords()">
+      <app-icon name="lock" size="16"></app-icon>
     </button>
-  </div>
-  <div
-    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-4 mt-5"
-  >
+  </ng-container>
+
+  <ng-container item>
     @for (category of categories(); track category.id) {
-    <app-category [category]="category"></app-category>
-    } @empty {
-    <div class="col-span-full text-center">
-      <p class="text-gray-500">No categories found</p>
-    </div>
+      <app-category [category]="category"></app-category>
     }
-  </div>
-  @if (modal()) {
-  <app-modal></app-modal>
-  }
-</main>
+  </ng-container>
+
+  <ng-container empty>
+    @if (categories().length === 0) {
+      <div class="col-span-full text-center py-12">
+        <app-icon name="list" size="64" customClass="text-gray-300 mx-auto mb-4"></app-icon>
+        <p class="text-gray-500 text-lg">No categories found</p>
+        <button class="btn btn-primary mt-4" (click)="addNewCategory()">
+          Create your first category
+        </button>
+      </div>
+    }
+  </ng-container>
+</app-shared-page>

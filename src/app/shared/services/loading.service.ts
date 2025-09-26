@@ -1,11 +1,11 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LoadingService {
   private loading$ = signal(false);
-  public loading = computed(() => this.loading$());
+  public loading = this.loading$.asReadonly()
 
   public showLoading(condition: boolean) {
     this.loading$.set(condition);

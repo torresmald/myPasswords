@@ -3,7 +3,13 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
-import { Password, CreatePassword, CreatePasswordApiResponse, ViewPassword } from '../interfaces';
+import {
+  Password,
+  CreatePassword,
+  CreatePasswordApiResponse,
+  ViewPassword,
+  UpdatePassword,
+} from '../interfaces';
 import { AlertService } from '@/shared/services/alert.service';
 import { LoadingService } from '@/shared/services/loading.service';
 
@@ -11,22 +17,22 @@ import { LoadingService } from '@/shared/services/loading.service';
   providedIn: 'root',
 })
 export class PasswordsService {
+  constructor() {
+    this.getAllPasswords().subscribe();
+  }
   private http = inject(HttpClient);
   private alertService = inject(AlertService);
   private loadingService = inject(LoadingService);
 
   private passwords$ = signal<Password[]>([]);
-  public passwords = computed(() => this.passwords$());
-  public setPasswords(passwords: Password[]) {
-    this.passwords$.set(passwords);
-  }
+  public passwords = this.passwords$.asReadonly();
 
   public shouldResetForm = signal(false);
 
-  public getAllPasswords(userId: string): Observable<Password[]> {
-    return this.http.post<Password[]>(`${environment.API_URL}/passwords/getAll`, { userId }).pipe(
+  public getAllPasswords(): Observable<Password[]> {
+    return this.http.get<Password[]>(`${environment.API_URL}/passwords/getAll`).pipe(
       tap((response) => {
-        this.setPasswords(response);
+        this.passwords$.set(response);
       }),
       catchError((error) => throwError(() => error))
     );
@@ -47,6 +53,7 @@ export class PasswordsService {
   }
 
   public createPassword(password: CreatePassword): Observable<Password[]> {
+
     return this.http
       .post<CreatePasswordApiResponse>(`${environment.API_URL}/passwords/create`, password)
       .pipe(
@@ -60,8 +67,28 @@ export class PasswordsService {
               user: response.category.user,
             },
           ];
-          this.setPasswords(password);
+          this.passwords$.set(password);
           return password;
+        }),
+        catchError((error) => throwError(() => error))
+      );
+  }
+
+  public updatePassword(
+    password: UpdatePassword
+  ): Observable<{ message: string; password: Password }> {
+    return this.http
+      .put<{ message: string; password: Password }>(
+        `${environment.API_URL}/passwords/update`,
+        password
+      )
+      .pipe(
+        tap((response) => {
+          this.passwords$.update((oldPasswords) =>
+            oldPasswords.map((pass) =>
+              pass.id === response.password.id ? response.password : pass
+            )
+          );
         }),
         catchError((error) => throwError(() => error))
       );
@@ -78,11 +105,6 @@ export class PasswordsService {
         tap((response) => this.passwords$.set(response.passwords)),
         catchError((error) => throwError(() => error))
       );
-  }
-
-  // Método para limpiar al hacer logout
-  public clearPasswords(): void {
-    this.setPasswords([]);
   }
 
   public setErrors(message: string, type: 'success' | 'error' = 'error') {

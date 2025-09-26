@@ -2,7 +2,7 @@ import { Category } from '@/category/interfaces';
 
 export interface CreatePassword {
   name: string;
-  idCategory: string;
+  categoryId: string;
   password: string;
   userId: string;
 }

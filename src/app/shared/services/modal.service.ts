@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { ModalType } from '../interfaces/modal.interface';
 import { Password } from '@/passwords/interfaces';
 
@@ -13,12 +13,12 @@ export class ModalService {
   private categoryId$ = signal<string>('');
   private password$ = signal<string>('');
 
-  public modal = computed(() => this.modal$());
-  public title = computed(() => this.title$());
-  public modalType = computed(() => this.modalType$());
-  public passwordId = computed(() => this.passwordId$());
-  public categoryId = computed(() => this.categoryId$());
-  public password = computed(() => this.password$());
+  public modal = this.modal$.asReadonly();
+  public title = this.title$.asReadonly();
+  public modalType = this.modalType$.asReadonly();
+  public passwordId = this.passwordId$.asReadonly();
+  public categoryId = this.categoryId$.asReadonly();
+  public password = this.password$.asReadonly();
 
   public showModal(condition: boolean = false) {
     this.modal$.set(condition);
@@ -66,6 +66,20 @@ export class ModalService {
     this.setTitle('Add New Category');
     this.setModalType('add-category');
     this.passwordId$.set('');
+    this.showModal(true);
+  }
+
+  public openUpdateDataCategoryModal(categoryId: string) {
+    this.setTitle('Update Category');
+    this.setModalType('update-data-category');
+    this.categoryId$.set(categoryId);
+    this.showModal(true);
+  }
+
+  public openUpdateDataPasswordModal(passwordId: string) {
+    this.setTitle('Update Password');
+    this.setModalType('update-data-password');
+    this.passwordId$.set(passwordId);
     this.showModal(true);
   }
 

@@ -7,10 +7,10 @@ import {
   signal,
   effect,
 } from '@angular/core';
-import { CreatePassword, ViewPassword } from '@/passwords/interfaces';
+import { CreatePassword, UpdatePassword, ViewPassword } from '@/passwords/interfaces';
 import { PasswordsService } from '@/passwords/services/passwords.service';
 import { CategoryService } from '@/category/services/category.service';
-import { CreateCategory } from '@/category/interfaces';
+import { CreateCategory, UpdateCategory } from '@/category/interfaces';
 import { AuthService } from '@/auth/services/auth.service';
 import { AuthFormComponent } from '@/shared/components/form/form';
 import {
@@ -18,6 +18,8 @@ import {
   CREATE_CATEGORY_CONFIG,
   VIEW_PASSWORD_CONFIG,
   DELETE_CONFIG,
+  UPDATE_DATA_CATEGORY,
+  UPDATE_DATA_PASSWORD,
 } from '@/shared/configs/form-configs';
 import { LoadingService } from '@/shared/services/loading.service';
 import { AlertService } from '@/shared/services/alert.service';
@@ -32,6 +34,7 @@ import {
   imports: [AuthFormComponent],
   templateUrl: './modal.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: ` .modal { position: absolute !important } `,
 })
 export class ModalComponent {
   private modalService = inject(ModalService);
@@ -41,16 +44,16 @@ export class ModalComponent {
   private loadingService = inject(LoadingService);
   private alertService = inject(AlertService);
 
+  public shouldResetForm$ = signal(false);
   public shouldResetForm = this.passwordsService.shouldResetForm;
 
   // Modal state
-  public getModal = computed(() => this.modalService.modal());
-  public getTitle = computed(() => this.modalService.title());
-  public getModalType = computed(() => this.modalService.modalType());
+  public getModal = this.modalService.modal;
+  public getTitle = this.modalService.title;
+  public getModalType = this.modalService.modalType;
 
   // Form configuration signals
   private formConfig$ = signal<FormConfig | null>(null);
-  public shouldResetForm$ = signal(false);
   public checked = signal(false);
   private userId = computed(() => this.authService.getUser()?.id!);
   public password = this.modalService.password;
@@ -58,13 +61,13 @@ export class ModalComponent {
   public categoryId = this.modalService.categoryId;
 
   private modalEffect = effect(() => {
-    if (this.getModalType() === 'add-password') {
+    if (this.getModalType() === 'add-password' || this.getModalType() === 'update-data-password') {
       this.loadCategoriesForPasswordForm();
     }
 
     // Load password data for view modal
     if (this.getModalType() === 'view-password') {
-      this.getPasswordId();
+      this.handleRequestPasswordCode(this.passwordId());
     }
   });
 
@@ -86,6 +89,12 @@ export class ModalComponent {
       case 'delete-category':
         config = DELETE_CONFIG;
         break;
+      case 'update-data-category':
+        config = UPDATE_DATA_CATEGORY;
+        break;
+      case 'update-data-password':
+        config = UPDATE_DATA_PASSWORD;
+        break;
       default:
         config = CREATE_PASSWORD_CONFIG;
     }
@@ -105,6 +114,9 @@ export class ModalComponent {
       case 'delete-password':
       case 'delete-category':
         return 'Delete';
+      case 'update-data-category':
+      case 'update-data-password':
+        return 'Update';
       default:
         return 'Submit';
     }
@@ -140,32 +152,30 @@ export class ModalComponent {
       case 'delete-category':
         this.handleDeleteCategory();
         break;
+      case 'update-data-category':
+        this.handleUpdateDataCategory(formData as UpdateCategory);
+        break;
+      case 'update-data-password':
+        this.handleUpdateDataPassword(formData as UpdatePassword);
+        break;
     }
   }
 
-  private getPasswordId() {
-    this.handleRequestPasswordCode(this.passwordId());
-  }
-
   private loadCategoriesForPasswordForm(): void {
-    this.categoryService.getAllCategories().subscribe((categories) => {
-      this.categoryService.setCategories(categories);
-
-      const categoryOptions: SelectOption[] = categories.map((category) => ({
-        value: category.id,
-        label: category.name,
-      }));
-      // Update form config with categories
-      const currentConfig = this.getFormConfig();
-      if (currentConfig) {
-        const updatedConfig = { ...currentConfig };
-        const categoryField = updatedConfig.fields.find((field) => field.name === 'idCategory');
-        if (categoryField && categoryField.type === 'select') {
-          categoryField.options = categoryOptions;
-          this.formConfig$.set(updatedConfig);
-        }
+    const categoryOptions: SelectOption[] = this.categoryService.categories().map((category) => ({
+      value: category.id,
+      label: category.name,
+    }));
+    // Update form config with categories
+    const currentConfig = this.getFormConfig();
+    if (currentConfig) {
+      const updatedConfig = { ...currentConfig };
+      const categoryField = updatedConfig.fields.find((field) => field.name === 'categoryId');
+      if (categoryField && categoryField.type === 'select') {
+        categoryField.options = categoryOptions;
+        this.formConfig$.set(updatedConfig);
       }
-    });
+    }
   }
 
   public closeModal() {
@@ -176,7 +186,6 @@ export class ModalComponent {
   private handlePasswordCreation(password: CreatePassword) {
     password.userId = this.userId();
     this.loadingService.showLoading(true);
-
     this.passwordsService.createPassword(password).subscribe({
       next: (response) => {
         this.passwordsService.setErrors('Created New Password', 'success');
@@ -221,6 +230,43 @@ export class ModalComponent {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  private handleUpdateDataCategory(category: UpdateCategory) {
+    category.categoryId = this.categoryId();
+    category.userId = this.userId();
+    this.loadingService.showLoading(true);
+    const formData = this.categoryService.prepareFormData(category);
+    this.categoryService.updateCategory(formData).subscribe({
+      next: (response) => {
+        this.passwordsService.setErrors(response.message, 'success');
+        this.modalService.showModal(false);
+      },
+      error: (error) => {
+        this.passwordsService.setErrors(error);
+      },
+      complete: () => {
+        this.loadingService.showLoading(false);
+      },
+    });
+  }
+
+  private handleUpdateDataPassword(password: UpdatePassword) {
+    password.userId = this.userId();
+    password.passwordId = this.passwordId();
+    this.loadingService.showLoading(true);
+    this.passwordsService.updatePassword(password).subscribe({
+      next: (response) => {
+        this.passwordsService.setErrors(response.message, 'success');
+        this.modalService.showModal(false);
+      },
+      error: (error) => {
+        this.passwordsService.setErrors(error);
+      },
+      complete: () => {
+        this.loadingService.showLoading(false);
+      },
+    });
   }
 
   public handleDeletePassword() {

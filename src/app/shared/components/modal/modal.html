@@ -28,7 +28,7 @@
     >
       <!-- Additional fields slot for future extensions -->
       <div slot="additional-fields">
-        @if (getModalType() === 'add-category') {
+        @if (getModalType() === 'add-category' || getModalType() === 'update-data-category') {
         <label class="flex items-center gap-2">
           <input
             id="checkbox-add-image-to-category"
@@ -37,7 +37,7 @@
             [checked]="checked()"
             (change)="checked.set($event.target.checked)"
           />
-          <span>Add Image to Category</span>
+          <span class="text-sm font-bold">Select Image</span>
         </label>
         @if (checked()) {
         <input

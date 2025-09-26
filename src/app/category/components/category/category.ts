@@ -14,7 +14,7 @@ export class CategoryComponent {
 
   private modalService = inject(ModalService);
 
-  public getCategoryBackgroundImage(categoryImage?: string): string {
+  protected getCategoryBackgroundImage(categoryImage?: string): string {
     if (categoryImage) {
       return `url(${categoryImage})`;
     }
@@ -23,7 +23,11 @@ export class CategoryComponent {
     return `url(${defaultImage})`;
   }
 
-  public deleteCategory() {
+  protected deleteCategory() {
     this.modalService.openDeleteCategory(this.category().id);
+  }
+
+  protected updateCategory() {
+    this.modalService.openUpdateDataCategoryModal(this.category().id);
   }
 }

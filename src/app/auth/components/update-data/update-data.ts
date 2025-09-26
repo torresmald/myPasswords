@@ -29,7 +29,7 @@ export default class UpdateDataComponent {
     this.shouldResetForm.set(false);
     const data: UpdateUser = userData as UpdateUser;
     data.token = this.authService.getToken()!;
-    const formData = this.authService.prepareFormDataUpdate(data);
+    const formData = this.authService.prepareFormData(data);
     this.loadingService.showLoading(true);
     try {
       this.authService.updateUserData(formData).subscribe({
