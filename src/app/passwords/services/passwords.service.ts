@@ -20,6 +20,9 @@ import { PaginationService } from '@/shared/services/pagination.service';
   providedIn: 'root',
 })
 export class PasswordsService {
+  constructor() {
+    this.getAllPasswords().subscribe();
+  }
   private http = inject(HttpClient);
   private alertService = inject(AlertService);
   private loadingService = inject(LoadingService);

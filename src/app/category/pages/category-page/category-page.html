@@ -16,13 +16,16 @@
     </button>
   </ng-container>
 
+  <ng-container filters>
+    <!-- <app-filter></app-filter> -->
+    <app-search (searchedValue)="searchText.set($event)"></app-search>
+  </ng-container>
+
   <ng-container item>
-    @defer (on idle) {
-      @for (category of categories(); track category.id) {
-      <app-category [category]="category"></app-category>
-      }
-    } @loading {
-      <app-loading></app-loading>
+    @defer (on idle) { @for (category of categories() | search: searchText() : 'category'; track category.id) {
+    <app-category [category]="category"></app-category>
+    } } @loading {
+    <app-loading></app-loading>
     }
   </ng-container>
 

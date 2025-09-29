@@ -17,6 +17,9 @@ import { LoadingService } from '@/shared/services/loading.service';
   providedIn: 'root',
 })
 export class CategoryService {
+  constructor() {
+    this.getAllCategories(1, 100).subscribe();
+  }
   private http = inject(HttpClient);
   private imageService = inject(ImageService);
   private paginationService = inject(PaginationService);

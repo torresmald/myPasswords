@@ -3,12 +3,14 @@
   <app-navbar></app-navbar>
 
   <main class="flex-1 container mx-auto px-4">
-    <div class="flex justify-between gap-2 my-4">
+    <div class="flex justify-between gap-2 my-4 items-center">
       <!-- Desktop buttons -->
       <div class="hidden md:flex gap-2 ml-auto">
         <ng-content select="[add-button]"></ng-content>
         <ng-content select="[manage-button]"></ng-content>
       </div>
+
+      <ng-content select="[filters]"></ng-content>
 
       <!-- Mobile: Pagination buttons + action buttons -->
       <div class="md:hidden flex justify-between items-center w-full gap-2">

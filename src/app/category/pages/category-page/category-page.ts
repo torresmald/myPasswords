@@ -4,13 +4,24 @@ import { SharedPageComponent } from '@/shared/pages/shared-page/shared-page';
 import { IconComponent } from '@/shared/components/svg/icon';
 import { ModalService } from '@/shared/services/modal.service';
 import { RouterService } from '@/shared/services/router.service';
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { PaginationService } from '@/shared/services/pagination.service';
 import { LoadingComponent } from '@/shared/components/loading/loading';
+import { FilterComponent } from '@/shared/components/filter/filter';
+import { SearchComponent } from '@/shared/components/search/search';
+import { SearchPipe } from '@/shared/pipes/search.pipe';
 
 @Component({
   selector: 'app-category-page',
-  imports: [SharedPageComponent, CategoryComponent, IconComponent, LoadingComponent],
+  imports: [
+    SharedPageComponent,
+    CategoryComponent,
+    IconComponent,
+    LoadingComponent,
+    FilterComponent,
+    SearchComponent,
+    SearchPipe,
+  ],
   templateUrl: './category-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -26,6 +37,7 @@ export default class CategoryPageComponent {
   protected paginationData = this.paginationService.paginationDataCategoy;
 
   public page = this.paginationService.page;
+  public searchText = signal('');
 
   protected pageChanged = effect(() => {
     this.categoryService.getAllCategories(this.page()).subscribe();
@@ -38,4 +50,5 @@ export default class CategoryPageComponent {
   protected managePasswords() {
     this.routerService.navigateTo('/passwords?page=1');
   }
+
 }
