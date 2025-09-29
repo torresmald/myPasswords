@@ -7,7 +7,6 @@ import { RouterService } from '@/shared/services/router.service';
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { PaginationService } from '@/shared/services/pagination.service';
 import { LoadingComponent } from '@/shared/components/loading/loading';
-import { FilterComponent } from '@/shared/components/filter/filter';
 import { SearchComponent } from '@/shared/components/search/search';
 import { SearchPipe } from '@/shared/pipes/search.pipe';
 
@@ -18,8 +17,7 @@ import { SearchPipe } from '@/shared/pipes/search.pipe';
     CategoryComponent,
     IconComponent,
     LoadingComponent,
-    FilterComponent,
-    SearchComponent,
+   SearchComponent,
     SearchPipe,
   ],
   templateUrl: './category-page.html',

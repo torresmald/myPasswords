@@ -10,7 +10,7 @@
         <ng-content select="[manage-button]"></ng-content>
       </div>
 
-      <ng-content select="[filters]"></ng-content>
+      <ng-content select="[search]"></ng-content>
 
       <!-- Mobile: Pagination buttons + action buttons -->
       <div class="md:hidden flex justify-between items-center w-full gap-2">
@@ -71,9 +71,7 @@
         >Next</app-button
       >
     </div>
-    }
-
-    @if (modal()) {
+    } @if (modal()) {
     <app-modal></app-modal>
     }
   </main>
