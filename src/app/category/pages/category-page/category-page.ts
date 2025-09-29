@@ -6,10 +6,11 @@ import { ModalService } from '@/shared/services/modal.service';
 import { RouterService } from '@/shared/services/router.service';
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { PaginationService } from '@/shared/services/pagination.service';
+import { LoadingComponent } from '@/shared/components/loading/loading';
 
 @Component({
   selector: 'app-category-page',
-  imports: [SharedPageComponent, CategoryComponent, IconComponent],
+  imports: [SharedPageComponent, CategoryComponent, IconComponent, LoadingComponent],
   templateUrl: './category-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

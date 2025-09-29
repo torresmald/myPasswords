@@ -27,9 +27,6 @@ export interface CreateCategory {
   image?: File;
 }
 
-export interface UpdateCategory {
+export interface UpdateCategory extends CreateCategory {
   categoryId: string;
-  name: string;
-  userId: string;
-  image?: File;
 }

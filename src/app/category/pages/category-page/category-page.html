@@ -17,8 +17,12 @@
   </ng-container>
 
   <ng-container item>
-    @for (category of categories(); track category.id) {
-    <app-category [category]="category"></app-category>
+    @defer (on idle) {
+      @for (category of categories(); track category.id) {
+      <app-category [category]="category"></app-category>
+      }
+    } @loading {
+      <app-loading></app-loading>
     }
   </ng-container>
 

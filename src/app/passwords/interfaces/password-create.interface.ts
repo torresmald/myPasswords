@@ -7,9 +7,8 @@ export interface CreatePassword {
   userId: string;
 }
 
-export interface CreatePasswordApiResponse {
+export interface CreatePasswordApiResponse extends CreatePassword {
   id: string;
-  name: string;
   category: Category;
   message: string;
 }

@@ -6,7 +6,7 @@ import {
   ForgotPassword,
   ForgotPasswordReset,
   UpdateUser,
-  UserLogin,
+  User,
   UserApi,
   UserRegister,
 } from '../interfaces';
@@ -49,7 +49,7 @@ export class AuthService {
     );
   }
 
-  public login(user: UserLogin): Observable<UserApi> {
+  public login(user: User): Observable<UserApi> {
     return this.http.post<UserApi>(`${environment.API_URL}/auth/login`, user).pipe(
       tap((user) => this.setResponses('authenticated', user)),
       catchError((error: any) => {

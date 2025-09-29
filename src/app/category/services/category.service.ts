@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { catchError, map, Observable, tap, throwError } from 'rxjs';
+import { catchError, delay, map, Observable, tap, throwError } from 'rxjs';
 import {
   Category,
   CategoryApiResponse,
@@ -11,6 +11,7 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { ImageService } from '@/shared/services/image.service';
 import { PaginationService } from '@/shared/services/pagination.service';
+import { LoadingService } from '@/shared/services/loading.service';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,7 @@ export class CategoryService {
   private http = inject(HttpClient);
   private imageService = inject(ImageService);
   private paginationService = inject(PaginationService);
+  private loadingService = inject(LoadingService);
 
   private categories$ = signal<Category[]>([]);
   public categories = this.categories$.asReadonly();
@@ -27,6 +29,7 @@ export class CategoryService {
     if (page < 0) {
       page = 1;
     }
+    this.loadingService.showLoading(true);
     return this.http
       .get<CategoryApiResponse>(
         `${environment.API_URL}/categories/getAll?page=${page}&limit=${limit}`
@@ -35,6 +38,7 @@ export class CategoryService {
         tap((response) => {
           this.categories$.set(response.data);
           this.paginationService.setPaginationDataCategory(response.pagination);
+          this.loadingService.showLoading(false);
         }),
         catchError((error) => throwError(() => error))
       );

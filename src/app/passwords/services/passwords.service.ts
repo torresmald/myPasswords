@@ -34,6 +34,7 @@ export class PasswordsService {
     if (page < 0) {
       page = 1;
     }
+    this.loadingService.showLoading(true);
     return this.http
       .get<PasswordApiResponse>(
         `${environment.API_URL}/passwords/getAll?page=${page}&limit=${limit}`
@@ -42,6 +43,7 @@ export class PasswordsService {
         tap((response) => {
           this.passwords$.set(response.data);
           this.paginationService.setPaginationDataPassword(response.pagination);
+          this.loadingService.showLoading(false);
         }),
         catchError((error) => throwError(() => error))
       );

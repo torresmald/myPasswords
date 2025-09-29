@@ -1,5 +1,5 @@
 import { LoadingService } from '@/shared/services/loading.service';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 @Component({
   selector: 'app-loading',
@@ -8,8 +8,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoadingComponent {
+  private loadingService = inject(LoadingService);
 
-  private loadingService = inject(LoadingService)
-
-  public loading = computed(() => this.loadingService.loading())
+  public loading = this.loadingService.loading;
 }

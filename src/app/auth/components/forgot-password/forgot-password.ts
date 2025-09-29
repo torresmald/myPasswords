@@ -1,4 +1,4 @@
-import {  UserLogin } from '@/auth/interfaces';
+import { User } from '@/auth/interfaces';
 import { AuthService } from '@/auth/services/auth.service';
 import { AuthFormComponent } from '@/shared/components/form/form';
 import { FORGOT_PASSWORD } from '@/shared/configs/form-configs';
@@ -26,7 +26,7 @@ export default class ForgotPasswordComponent {
 
   onForgotPassword(userData: FormDataConfig) {
     this.shouldResetForm.set(false);
-    const email: UserLogin = userData as UserLogin;
+    const email: User = userData as User;
     const emailToForgot = email.email;
     this.loadingService.showLoading(true);
 

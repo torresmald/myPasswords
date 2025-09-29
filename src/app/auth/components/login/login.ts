@@ -5,7 +5,7 @@ import { LOGIN_CONFIG } from '@/shared/configs/form-configs';
 import { AuthService } from '@/auth/services/auth.service';
 import { RouterService } from '@/shared/services/router.service';
 import { AlertService } from '@/shared/services/alert.service';
-import { UserLogin } from '@/auth/interfaces/user.interface';
+import { User } from '@/auth/interfaces/user.interface';
 import { LoadingService } from '@/shared/services/loading.service';
 import { FormDataConfig } from '@/shared/interfaces/form-config.interface';
 
@@ -21,18 +21,17 @@ export default class LoginComponent {
   private routerService = inject(RouterService);
   alertService = inject(AlertService);
   private loadingService = inject(LoadingService);
-  public shouldResetForm = this.authService.shouldResetForm
+  public shouldResetForm = this.authService.shouldResetForm;
 
   onLogin(userData: FormDataConfig) {
     this.authService.shouldResetForm.set(false);
-    const user: UserLogin = userData as UserLogin;
+    const user: User = userData as User;
     this.loadingService.showLoading(true);
     try {
       this.authService.login(user).subscribe({
         next: (response) => {
           this.routerService.navigateTo('/passwords');
           this.authService.setErrors('User Logged', 'success');
-
         },
         error: (response) => {
           this.authService.setErrors(response);

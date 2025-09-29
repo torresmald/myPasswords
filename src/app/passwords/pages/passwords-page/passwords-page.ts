@@ -6,10 +6,11 @@ import { ModalService } from '@/shared/services/modal.service';
 import { RouterService } from '@/shared/services/router.service';
 import { SharedPageComponent } from '@/shared/pages/shared-page/shared-page';
 import { PaginationService } from '@/shared/services/pagination.service';
+import { LoadingComponent } from '@/shared/components/loading/loading';
 
 @Component({
   selector: 'app-passwords-page',
-  imports: [PasswordComponent, SharedPageComponent, IconComponent],
+  imports: [PasswordComponent, SharedPageComponent, IconComponent, LoadingComponent],
   templateUrl: './passwords-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
