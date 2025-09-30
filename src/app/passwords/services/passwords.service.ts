@@ -60,6 +60,14 @@ export class PasswordsService {
       .pipe(catchError((error) => throwError(() => error)));
   }
 
+  public requestPasswordCodeWhatsapp(idPassword: string): Observable<{ message: string }> {
+    return this.http
+      .post<{ message: string }>(`${environment.API_URL}/passwords/requestPasswordCodeWhatsapp`, {
+        idPassword,
+      })
+      .pipe(catchError((error) => throwError(() => error)));
+  }
+
   public getPassword(data: ViewPassword): Observable<Password> {
     return this.http
       .post<Password>(`${environment.API_URL}/passwords/getPassword`, data)

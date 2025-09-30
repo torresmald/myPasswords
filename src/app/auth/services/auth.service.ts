@@ -39,6 +39,11 @@ export class AuthService {
     return 'not-authenticated';
   });
 
+  public isAdminUser = computed(() => {
+    if (this.user() && (this.user()?.email === 'samsara.alvarado@gmail.com' || this.user()?.email === 'jonathan.torresmald@gmail.com')) return true;
+    return false;
+  });
+
   public register(user: FormData): Observable<UserApi> {
     return this.http.post<UserApi>(`${environment.API_URL}/auth/register`, user).pipe(
       tap((user) => this.setResponses('authenticated', user)),

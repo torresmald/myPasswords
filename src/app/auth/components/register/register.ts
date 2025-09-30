@@ -22,7 +22,7 @@ export default class RegisterComponent {
   private loadingService = inject(LoadingService);
   private imageService = inject(ImageService);
   public checked = signal(false);
-//  public checkedWhatsapp = signal(false);
+  public checkedWhatsapp = signal(false);
 
   public shouldResetForm = this.authService.shouldResetForm;
 

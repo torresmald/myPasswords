@@ -56,6 +56,7 @@ export class ModalComponent {
   private formConfig$ = signal<FormConfig | null>(null);
   public checked = signal(false);
   private userId = computed(() => this.authService.getUser()?.id!);
+  public isAdminUser = this.authService.isAdminUser;
   public password = this.modalService.password;
   public passwordId = this.modalService.passwordId;
   public categoryId = this.modalService.categoryId;
@@ -65,8 +66,12 @@ export class ModalComponent {
       this.loadCategoriesForPasswordForm();
     }
 
+    if (this.getModalType() === 'view-password' && this.isAdminUser()) {
+      this.handleRequestPasswordCodeWhatsapp(this.passwordId());
+    }
+
     // Load password data for view modal
-    if (this.getModalType() === 'view-password') {
+    if (this.getModalType() === 'view-password' && !this.isAdminUser()) {
       this.handleRequestPasswordCode(this.passwordId());
     }
   });
@@ -223,6 +228,19 @@ export class ModalComponent {
     this.loadingService.showLoading(true);
     try {
       this.passwordsService.requestPasswordCode(passwordId).subscribe({
+        next: (response) => this.passwordsService.setErrors(response.message, 'success'),
+        error: (error) => this.passwordsService.setErrors(error),
+        complete: () => this.loadingService.showLoading(false),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  private handleRequestPasswordCodeWhatsapp(passwordId: string) {
+    this.loadingService.showLoading(true);
+    try {
+      this.passwordsService.requestPasswordCodeWhatsapp(passwordId).subscribe({
         next: (response) => this.passwordsService.setErrors(response.message, 'success'),
         error: (error) => this.passwordsService.setErrors(error),
         complete: () => this.loadingService.showLoading(false),

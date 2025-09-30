@@ -3,6 +3,7 @@ import { PasswordsService } from '@/passwords/services/passwords.service';
 import { ModalService } from '@/shared/services/modal.service';
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { IconComponent } from '@/shared/components/svg/icon';
+import { AuthService } from '@/auth/services/auth.service';
 
 @Component({
   selector: 'app-password',
@@ -11,12 +12,15 @@ import { IconComponent } from '@/shared/components/svg/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordComponent {
-  public password = input.required<Password>();
   private modalService = inject(ModalService);
+  private authService = inject(AuthService);
+  public password = input.required<Password>();
+  protected isAdminUser = this.authService.isAdminUser;
 
   protected showPassword() {
     this.modalService.openViewPasswordModal(this.password().id);
   }
+
 
   protected deletePassword() {
     this.modalService.openDeletePassword(this.password().id);
