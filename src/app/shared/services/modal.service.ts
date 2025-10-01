@@ -12,6 +12,7 @@ export class ModalService {
   private passwordId$ = signal<string>('');
   private categoryId$ = signal<string>('');
   private password$ = signal<string>('');
+  private method$ = signal<'email' | 'whatsapp'>('email');
 
   public modal = this.modal$.asReadonly();
   public title = this.title$.asReadonly();
@@ -19,6 +20,7 @@ export class ModalService {
   public passwordId = this.passwordId$.asReadonly();
   public categoryId = this.categoryId$.asReadonly();
   public password = this.password$.asReadonly();
+  public method = this.method$.asReadonly();
 
   public showModal(condition: boolean = false) {
     this.modal$.set(condition);
@@ -47,10 +49,11 @@ export class ModalService {
     this.showModal(true);
   }
 
-  public openViewPasswordModal(passwordId: string) {
+  public openViewPasswordModal(passwordId: string, method: 'email' | 'whatsapp') {
     this.setTitle('Password Details');
     this.setModalType('view-password');
     this.passwordId$.set(passwordId);
+    this.method$.set(method)
     this.showModal(true);
   }
 

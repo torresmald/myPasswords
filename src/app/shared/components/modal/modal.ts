@@ -66,7 +66,11 @@ export class ModalComponent {
       this.loadCategoriesForPasswordForm();
     }
 
-    if (this.getModalType() === 'view-password' && this.isAdminUser()) {
+    if (
+      this.getModalType() === 'view-password' &&
+      this.isAdminUser() &&
+      this.modalService.method() === 'whatsapp'
+    ) {
       this.handleRequestPasswordCodeWhatsapp(this.passwordId());
     }
 

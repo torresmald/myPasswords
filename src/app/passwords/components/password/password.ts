@@ -17,8 +17,8 @@ export class PasswordComponent {
   public password = input.required<Password>();
   protected isAdminUser = this.authService.isAdminUser;
 
-  protected showPassword() {
-    this.modalService.openViewPasswordModal(this.password().id);
+  protected showPassword(method: 'email' | 'whatsapp' = 'email') {
+    this.modalService.openViewPasswordModal(this.password().id, method);
   }
 
 

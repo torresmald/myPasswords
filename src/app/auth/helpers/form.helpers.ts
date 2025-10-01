@@ -5,15 +5,15 @@ export class FormHelpers {
     for (const key of Object.keys(errors)) {
       switch (key) {
         case 'required':
-          return 'El campo es requerido';
+          return 'The field is required';
         case 'minlength':
-          return `El campo debe tener al menos ${errors['minlength'].requiredLength} caracteres`;
+          return `The filed must have at least ${errors['minlength'].requiredLength} caracteres`;
         case 'min':
-          return `El campo debe ser mininmo ${errors['min'].min}`;
+          return `The field must be at least ${errors['min'].min}`;
         case 'pattern':
-          return `El campo no tiene un formato valido`;
+          return `Invalid format`;
         case 'passwordNotEqual':
-          return 'Los password no son iguales';
+          return 'Passwords are not equal';
       }
     }
     return null;
