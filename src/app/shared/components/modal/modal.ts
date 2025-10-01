@@ -75,7 +75,7 @@ export class ModalComponent {
     }
 
     // Load password data for view modal
-    if (this.getModalType() === 'view-password' && !this.isAdminUser()) {
+    if (this.getModalType() === 'view-password' && this.modalService.method() === 'email') {
       this.handleRequestPasswordCode(this.passwordId());
     }
   });
