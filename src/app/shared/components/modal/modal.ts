@@ -7,7 +7,7 @@ import {
   signal,
   effect,
 } from '@angular/core';
-import { CreatePassword, UpdatePassword, ViewPassword } from '@/passwords/interfaces';
+import { CreatePassword, Password, UpdatePassword, ViewPassword } from '@/passwords/interfaces';
 import { PasswordsService } from '@/passwords/services/passwords.service';
 import { CategoryService } from '@/category/services/category.service';
 import { CreateCategory, UpdateCategory } from '@/category/interfaces';
@@ -28,13 +28,14 @@ import {
   FormDataConfig,
   SelectOption,
 } from '@/shared/interfaces/form-config.interface';
+import { SharedService } from '@/shared/services/shared.service';
 
 @Component({
   selector: 'app-modal',
   imports: [AuthFormComponent],
   templateUrl: './modal.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: ` .modal { position: absolute !important } `,
+  // styles: ` .modal { position: absolute !important } `,
 })
 export class ModalComponent {
   private modalService = inject(ModalService);
@@ -43,9 +44,10 @@ export class ModalComponent {
   private authService = inject(AuthService);
   private loadingService = inject(LoadingService);
   private alertService = inject(AlertService);
+  private sharedService = inject(SharedService);
 
   public shouldResetForm$ = signal(false);
-  public shouldResetForm = this.passwordsService.shouldResetForm;
+  public shouldResetForm = this.sharedService.shouldResetForm;
 
   // Modal state
   public getModal = this.modalService.modal;
@@ -58,8 +60,7 @@ export class ModalComponent {
   private userId = computed(() => this.authService.getUser()?.id!);
   public isAdminUser = this.authService.isAdminUser;
   public password = this.modalService.password;
-  public passwordId = this.modalService.passwordId;
-  public categoryId = this.modalService.categoryId;
+  public category = this.modalService.category;
 
   private modalEffect = effect(() => {
     if (this.getModalType() === 'add-password' || this.getModalType() === 'update-data-password') {
@@ -71,12 +72,12 @@ export class ModalComponent {
       this.isAdminUser() &&
       this.modalService.method() === 'whatsapp'
     ) {
-      this.handleRequestPasswordCodeWhatsapp(this.passwordId());
+      this.handleRequestPasswordCodeWhatsapp(this.password()!);
     }
 
     // Load password data for view modal
     if (this.getModalType() === 'view-password' && this.modalService.method() === 'email') {
-      this.handleRequestPasswordCode(this.passwordId());
+      this.handleRequestPasswordCode(this.password()!);
     }
   });
 
@@ -195,45 +196,42 @@ export class ModalComponent {
   private handlePasswordCreation(password: CreatePassword) {
     password.userId = this.userId();
     this.loadingService.showLoading(true);
-    this.passwordsService.createPassword(password).subscribe({
-      next: (response) => {
-        this.passwordsService.setErrors('Created New Password', 'success');
+    const formData = this.sharedService.prepareFormData(password);
+
+    this.passwordsService.createPasswordMutation.mutate(formData, {
+      onSuccess: () => {
+        this.sharedService.setErrors('Password Created', 'success');
         this.modalService.showModal(false);
       },
-      error: (error) => {
-        this.passwordsService.setErrors(error);
-      },
-      complete: () => {
-        this.loadingService.showLoading(false);
+      onError: (error: any) => {
+        this.sharedService.setErrors(error.message || error);
       },
     });
   }
 
   private handleCategoryCreation(category: CreateCategory) {
     category.userId = this.userId();
-    this.loadingService.showLoading(true);
 
-    const formData = this.categoryService.prepareFormData(category);
-    this.categoryService.createCategory(formData).subscribe({
-      next: (response) => {
-        this.passwordsService.setErrors('Category Created', 'success');
+    const formData = this.sharedService.prepareFormData(category);
+
+    // Usar la mutation de TanStack Query
+    this.categoryService.createCategoryMutation.mutate(formData, {
+      onSuccess: () => {
+        this.sharedService.setErrors('Category Created', 'success');
         this.modalService.showModal(false);
       },
-      error: (error) => {
-        this.passwordsService.setErrors(error);
-      },
-      complete: () => {
-        this.loadingService.showLoading(false);
+      onError: (error: any) => {
+        this.sharedService.setErrors(error.message || error);
       },
     });
   }
 
-  private handleRequestPasswordCode(passwordId: string) {
+  private handleRequestPasswordCode(password: Password) {
     this.loadingService.showLoading(true);
     try {
-      this.passwordsService.requestPasswordCode(passwordId).subscribe({
-        next: (response) => this.passwordsService.setErrors(response.message, 'success'),
-        error: (error) => this.passwordsService.setErrors(error),
+      this.passwordsService.requestPasswordCode(password.id).subscribe({
+        next: (response) => this.sharedService.setErrors(response.message, 'success'),
+        error: (error) => this.sharedService.setErrors(error),
         complete: () => this.loadingService.showLoading(false),
       });
     } catch (error) {
@@ -241,12 +239,12 @@ export class ModalComponent {
     }
   }
 
-  private handleRequestPasswordCodeWhatsapp(passwordId: string) {
+  private handleRequestPasswordCodeWhatsapp(password: Password) {
     this.loadingService.showLoading(true);
     try {
-      this.passwordsService.requestPasswordCodeWhatsapp(passwordId).subscribe({
-        next: (response) => this.passwordsService.setErrors(response.message, 'success'),
-        error: (error) => this.passwordsService.setErrors(error),
+      this.passwordsService.requestPasswordCodeWhatsapp(password.id).subscribe({
+        next: (response) => this.sharedService.setErrors(response.message, 'success'),
+        error: (error) => this.sharedService.setErrors(error),
         complete: () => this.loadingService.showLoading(false),
       });
     } catch (error) {
@@ -255,35 +253,34 @@ export class ModalComponent {
   }
 
   private handleUpdateDataCategory(category: UpdateCategory) {
-    category.categoryId = this.categoryId();
+    category.categoryId = this.category()?.id!;
     category.userId = this.userId();
-    this.loadingService.showLoading(true);
-    const formData = this.categoryService.prepareFormData(category);
-    this.categoryService.updateCategory(formData).subscribe({
-      next: (response) => {
-        this.passwordsService.setErrors(response.message, 'success');
+
+    const formData = this.sharedService.prepareFormData(category);
+
+    // 🚀 Usar la mutation con optimistic updates
+    this.categoryService.updateCategoryMutation.mutate(formData, {
+      onSuccess: (response) => {
+        this.sharedService.setErrors(response.message, 'success');
         this.modalService.showModal(false);
       },
-      error: (error) => {
-        this.passwordsService.setErrors(error);
-      },
-      complete: () => {
-        this.loadingService.showLoading(false);
+      onError: (error: any) => {
+        this.sharedService.setErrors(error.message || 'Error updating category');
       },
     });
   }
 
   private handleUpdateDataPassword(password: UpdatePassword) {
     password.userId = this.userId();
-    password.passwordId = this.passwordId();
+    password.passwordId = this.password()?.id!;
     this.loadingService.showLoading(true);
     this.passwordsService.updatePassword(password).subscribe({
       next: (response) => {
-        this.passwordsService.setErrors(response.message, 'success');
+        this.sharedService.setErrors(response.message, 'success');
         this.modalService.showModal(false);
       },
       error: (error) => {
-        this.passwordsService.setErrors(error);
+        this.sharedService.setErrors(error);
       },
       complete: () => {
         this.loadingService.showLoading(false);
@@ -294,13 +291,13 @@ export class ModalComponent {
   public handleDeletePassword() {
     this.loadingService.showLoading(true);
     try {
-      this.passwordsService.deletePassword(this.passwordId()).subscribe({
+      this.passwordsService.deletePassword(this.password()?.id!).subscribe({
         next: (response) => {
-          this.passwordsService.setErrors(response.message, 'success');
+          this.sharedService.setErrors(response.message, 'success');
 
           this.modalService.resetModal();
         },
-        error: (error) => this.passwordsService.setErrors(error),
+        error: (error) => this.sharedService.setErrors(error),
         complete: () => this.loadingService.showLoading(false),
       });
     } catch (error) {
@@ -309,35 +306,29 @@ export class ModalComponent {
   }
 
   public handleDeleteCategory() {
-    this.loadingService.showLoading(true);
-    try {
-      this.categoryService.deleteCategory(this.categoryId()).subscribe({
-        next: (response) => {
-          this.passwordsService.setErrors(response.message, 'success');
-          this.modalService.resetModal();
-        },
-        error: (error) => {
-          this.passwordsService.setErrors(error);
-          this.modalService.resetModal();
-        },
-        complete: () => this.loadingService.showLoading(false),
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    this.categoryService.deleteCategoryMutation.mutate(this.category()?.id!, {
+      onSuccess: (response) => {
+        this.sharedService.setErrors(response.message, 'success');
+        this.modalService.resetModal();
+      },
+      onError: (error: any) => {
+        this.sharedService.setErrors(error.message || 'Error deleting category');
+        this.modalService.resetModal();
+      },
+    });
   }
 
   private handleViewPassword(data: ViewPassword) {
-    const passwordId = this.modalService.passwordId();
+    const passwordId = this.modalService.password()?.id!;
     data.idPassword = passwordId;
     this.loadingService.showLoading(true);
     try {
       this.passwordsService.getPassword(data).subscribe({
         next: (response) => {
-          this.passwordsService.setErrors('View password', 'success');
+          this.sharedService.setErrors('View password', 'success');
           this.modalService.openViewPasswordModalData(response);
         },
-        error: (error) => this.passwordsService.setErrors(error),
+        error: (error) => this.sharedService.setErrors(error),
         complete: () => this.loadingService.showLoading(false),
       });
     } catch (error) {

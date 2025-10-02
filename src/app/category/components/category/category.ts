@@ -24,10 +24,10 @@ export class CategoryComponent {
   }
 
   protected deleteCategory() {
-    this.modalService.openDeleteCategory(this.category().id);
+    this.modalService.openDeleteCategory(this.category());
   }
 
   protected updateCategory() {
-    this.modalService.openUpdateDataCategoryModal(this.category().id);
+    this.modalService.openUpdateDataCategoryModal(this.category());
   }
 }

@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { catchError, Observable, of, tap, throwError } from 'rxjs';
 import {
   AuthStatus,
   ForgotPassword,
   ForgotPasswordReset,
+  UpdatedUser,
   UpdateUser,
   User,
   UserApi,
@@ -32,6 +33,11 @@ export class AuthService {
   private token = signal<string | null>(localStorage.getItem('myPasswordToken'));
   public getToken = this.token.asReadonly();
   public getUser = this.user.asReadonly();
+  public isUserLogged = signal(false);
+
+  private tokenEffect = effect(() => {
+    console.log('token', this.token());
+  });
 
   public getAuthStatus = computed<AuthStatus>(() => {
     if (this.authStatus() === 'checking') return 'checking';
@@ -40,7 +46,12 @@ export class AuthService {
   });
 
   public isAdminUser = computed(() => {
-    if (this.user() && (this.user()?.email === 'samsara.alvarado@gmail.com' || this.user()?.email === 'jonathan.torresmald@gmail.com')) return true;
+    if (
+      this.user() &&
+      (this.user()?.email === 'samsara.alvarado@gmail.com' ||
+        this.user()?.email === 'jonathan.torresmald@gmail.com')
+    )
+      return true;
     return false;
   });
 
@@ -73,6 +84,7 @@ export class AuthService {
     return this.http.get<UserApi>(`${environment.API_URL}/auth/check-token`).pipe(
       tap((user) => {
         this.setResponses('authenticated', user);
+        this.isUserLogged.set(true);
       }),
       catchError((error: any) => {
         this.logout();
@@ -104,10 +116,11 @@ export class AuthService {
       .pipe(catchError((error) => throwError(() => error)));
   }
 
-  public updateUserData(updateUserData: FormData): Observable<ForgotPassword> {
-    return this.http
-      .put<ForgotPassword>(`${environment.API_URL}/auth/update`, updateUserData)
-      .pipe(catchError((error) => throwError(() => error)));
+  public updateUserData(updateUserData: FormData): Observable<UpdatedUser> {
+    return this.http.put<UpdatedUser>(`${environment.API_URL}/auth/update`, updateUserData).pipe(
+      tap((response) => this.setResponses('authenticated', response.user)),
+      catchError((error) => throwError(() => error))
+    );
   }
 
   public setResponses(authStatus: AuthStatus, user: UserApi): UserApi {
@@ -122,6 +135,7 @@ export class AuthService {
     this.authStatus.set('not-authenticated');
     this.user.set(null);
     this.token.set(null);
+    this.isUserLogged.set(false);
     localStorage.removeItem('myPasswordToken');
     this.routerService.navigateTo('/home');
   }

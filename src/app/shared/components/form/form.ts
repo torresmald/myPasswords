@@ -26,11 +26,24 @@ export class AuthFormComponent implements OnInit {
   public submitButtonColor = input<string>('btn-primary');
   public isAuthForm = input.required<boolean>();
 
+  public value = input<string>('')
+
   public shouldResetForm = input.required<boolean>();
 
   public effectForm = effect(() => {
     if (this.shouldResetForm()) {
       this.createForm();
+    }
+  });
+
+  // Effect para actualizar el valor cuando cambie el input
+  public valueEffect = effect(() => {
+    const currentValue = this.value();
+    if (this.myForm && currentValue) {
+      const nameControl = this.myForm.get('name');
+      if (nameControl && nameControl.value !== currentValue) {
+        nameControl.setValue(currentValue);
+      }
     }
   });
 
@@ -48,7 +61,9 @@ export class AuthFormComponent implements OnInit {
     const formControls: { [key: string]: any } = {};
 
     this.config().fields.forEach((field) => {
-      formControls[field.name] = ['', field.validators];
+      // Usar el valor del input si existe, sino string vacío
+      const initialValue = field.name === 'name' ? this.value() : '';
+      formControls[field.name] = [initialValue, field.validators];
     });
 
     this.myForm = this.fb.group(formControls, {

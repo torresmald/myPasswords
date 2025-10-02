@@ -16,7 +16,7 @@ export default class HomePageComponent {
   public user = computed(() => this.authService.getUser());
 
   public navigateToAuth() {
-    this.routerService.navigateTo('/auth/register');
+    this.routerService.navigateTo('/auth/login');
   }
 
   public navigateToPasswords() {

@@ -25,3 +25,8 @@ export interface UpdateUser {
   repeatPassword: string;
   image?: File;
 }
+
+export interface UpdatedUser {
+  message: string;
+  user: UserApi
+}

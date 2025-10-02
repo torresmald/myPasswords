@@ -12,7 +12,9 @@
       <h1 class="text-2xl font-bold">Password Data</h1>
       <p class="text-sm text-gray-500">
         Password:
-        <span class="font-bold cursor-pointer" (click)="copyPassword(password())">{{ password() }}</span>
+        <span class="font-bold cursor-pointer" (click)="copyPassword(password()?.password!)">{{
+          password()
+        }}</span>
       </p>
     </div>
     } @else {
@@ -23,6 +25,7 @@
       [submitButtonText]="getSubmitButtonText()"
       [submitButtonColor]="getSubmitButtonColor()"
       [isAuthForm]="false"
+      [value]="getModalType() === 'update-data-category' ? category()?.name! : password()?.name!"
       [shouldResetForm]="shouldResetForm()"
       (formSubmit)="onFormSubmit($event)"
     >

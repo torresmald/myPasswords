@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { ModalType } from '../interfaces/modal.interface';
 import { Password } from '@/passwords/interfaces';
+import { Category } from '@/category/interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -9,16 +10,14 @@ export class ModalService {
   private modal$ = signal(false);
   private title$ = signal('');
   private modalType$ = signal<ModalType | null>(null);
-  private passwordId$ = signal<string>('');
-  private categoryId$ = signal<string>('');
-  private password$ = signal<string>('');
+  private category$ = signal<Category | null>(null);
+  private password$ = signal<Password | null>(null);
   private method$ = signal<'email' | 'whatsapp'>('email');
 
   public modal = this.modal$.asReadonly();
   public title = this.title$.asReadonly();
   public modalType = this.modalType$.asReadonly();
-  public passwordId = this.passwordId$.asReadonly();
-  public categoryId = this.categoryId$.asReadonly();
+  public category = this.category$.asReadonly();
   public password = this.password$.asReadonly();
   public method = this.method$.asReadonly();
 
@@ -29,8 +28,8 @@ export class ModalService {
     if (!condition) {
       this.setTitle('');
       this.setModalType(null);
-      this.passwordId$.set('');
-      this.password$.set('');
+      this.password$.set(null);
+      this.category$.set(null);
     }
   }
 
@@ -45,58 +44,57 @@ export class ModalService {
   public openAddPasswordModal() {
     this.setTitle('Add New Password');
     this.setModalType('add-password');
-    this.passwordId$.set('');
+    this.password$.set(null);
     this.showModal(true);
   }
 
-  public openViewPasswordModal(passwordId: string, method: 'email' | 'whatsapp') {
+  public openViewPasswordModal(password: Password, method: 'email' | 'whatsapp') {
     this.setTitle('Password Details');
     this.setModalType('view-password');
-    this.passwordId$.set(passwordId);
-    this.method$.set(method)
+    this.password$.set(password);
+    this.method$.set(method);
     this.showModal(true);
   }
 
   public openViewPasswordModalData(password: Password) {
     this.setTitle('Password Data');
     this.setModalType('view-password-data');
-    this.passwordId$.set(password.id);
-    this.password$.set(password.password!);
+    this.password$.set(password);
     this.showModal(true);
   }
 
   public openAddCategoryModal() {
     this.setTitle('Add New Category');
     this.setModalType('add-category');
-    this.passwordId$.set('');
+    this.password$.set(null);
     this.showModal(true);
   }
 
-  public openUpdateDataCategoryModal(categoryId: string) {
+  public openUpdateDataCategoryModal(category: Category) {
     this.setTitle('Update Category');
     this.setModalType('update-data-category');
-    this.categoryId$.set(categoryId);
+    this.category$.set(category);
     this.showModal(true);
   }
 
-  public openUpdateDataPasswordModal(passwordId: string) {
+  public openUpdateDataPasswordModal(password: Password) {
     this.setTitle('Update Password');
     this.setModalType('update-data-password');
-    this.passwordId$.set(passwordId);
+    this.password$.set(password);
     this.showModal(true);
   }
 
-  public openDeletePassword(passwordId: string) {
+  public openDeletePassword(password: Password) {
     this.setTitle('Are you sure you want to delete the Password?');
     this.setModalType('delete-password');
-    this.passwordId$.set(passwordId);
+    this.password$.set(password);
     this.showModal(true);
   }
 
-  public openDeleteCategory(categoryId: string) {
+  public openDeleteCategory(category: Category) {
     this.setTitle('Are you sure you want to delete the Category?');
     this.setModalType('delete-category');
-    this.categoryId$.set(categoryId);
+    this.category$.set(category);
     this.showModal(true);
   }
 
@@ -104,8 +102,7 @@ export class ModalService {
     this.setTitle('');
     this.setModalType(null);
     this.showModal(false);
-    this.passwordId$.set('');
-    this.password$.set('');
-    this.password$.set('');
+    this.password$.set(null);
+    this.category$.set(null);
   }
 }

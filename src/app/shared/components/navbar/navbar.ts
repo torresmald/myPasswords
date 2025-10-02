@@ -2,10 +2,11 @@ import { AuthService } from '@/auth/services/auth.service';
 import { ModalService } from '@/shared/services/modal.service';
 import { RouterService } from '@/shared/services/router.service';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './navbar.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -18,16 +18,15 @@ export class PasswordComponent {
   protected isAdminUser = this.authService.isAdminUser;
 
   protected showPassword(method: 'email' | 'whatsapp' = 'email') {
-    this.modalService.openViewPasswordModal(this.password().id, method);
+    this.modalService.openViewPasswordModal(this.password(), method);
   }
 
-
   protected deletePassword() {
-    this.modalService.openDeletePassword(this.password().id);
+    this.modalService.openDeletePassword(this.password());
   }
 
   protected updatePassword() {
-    this.modalService.openUpdateDataPasswordModal(this.password().id);
+    this.modalService.openUpdateDataPasswordModal(this.password());
   }
 
   protected getCategoryBackgroundImage(categoryImage?: string): string {

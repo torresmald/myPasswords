@@ -1,7 +1,14 @@
 import { PasswordComponent } from '@/passwords/components/password/password';
 import { PasswordsService } from '@/passwords/services/passwords.service';
 import { IconComponent } from '@/shared/components/svg/icon';
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { ModalService } from '@/shared/services/modal.service';
 import { RouterService } from '@/shared/services/router.service';
 import { SharedPageComponent } from '@/shared/pages/shared-page/shared-page';
@@ -29,15 +36,20 @@ export default class PasswordsPageComponent {
   private routerService = inject(RouterService);
   private paginationService = inject(PaginationService);
 
-  public passwords = this.passwordsService.passwords;
+  public passwordsQuery = computed(() => this.passwordsService.passwordsQuery);
+  public passwords = computed(() => this.passwordsQuery().data()?.data ?? []);
   public modal = this.modalService.modal;
   public page = this.paginationService.page;
 
   protected paginationData = this.paginationService.paginationDataPassword;
   protected searchText = signal('');
 
-  protected pageChanged = effect(() => {
-    this.passwordsService.getAllPasswords(this.page()).subscribe();
+  private updateDataEffect = effect(() => {
+    const queryData = this.passwordsQuery().data();
+    if (queryData) {
+      this.paginationService.setPaginationDataPassword(queryData.pagination);
+      this.passwordsService.setPasswords(queryData.data);
+    }
   });
 
   public addPassword() {

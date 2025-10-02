@@ -4,7 +4,14 @@ import { SharedPageComponent } from '@/shared/pages/shared-page/shared-page';
 import { IconComponent } from '@/shared/components/svg/icon';
 import { ModalService } from '@/shared/services/modal.service';
 import { RouterService } from '@/shared/services/router.service';
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { PaginationService } from '@/shared/services/pagination.service';
 import { LoadingComponent } from '@/shared/components/loading/loading';
 import { SearchComponent } from '@/shared/components/search/search';
@@ -17,7 +24,7 @@ import { SearchPipe } from '@/shared/pipes/search.pipe';
     CategoryComponent,
     IconComponent,
     LoadingComponent,
-   SearchComponent,
+    SearchComponent,
     SearchPipe,
   ],
   templateUrl: './category-page.html',
@@ -29,16 +36,20 @@ export default class CategoryPageComponent {
   private modalService = inject(ModalService);
   private paginationService = inject(PaginationService);
 
-  protected categories = this.categoryService.categories;
+  public categoriesQuery = computed(() => this.categoryService.categoriesQuery);
+  protected categories = computed(() => this.categoriesQuery().data()?.data ?? []);
+
   protected modal = this.modalService.modal;
-
   protected paginationData = this.paginationService.paginationDataCategoy;
-
   public page = this.paginationService.page;
   public searchText = signal('');
 
-  protected pageChanged = effect(() => {
-    this.categoryService.getAllCategories(this.page()).subscribe();
+  // Effect para actualizar paginación y categories signal cuando cambian los datos de la query
+  private updateDataEffect = effect(() => {
+    const queryData = this.categoriesQuery().data();
+    if (queryData) {
+      this.paginationService.setPaginationDataCategory(queryData.pagination);
+    }
   });
 
   protected addNewCategory() {
@@ -48,5 +59,4 @@ export default class CategoryPageComponent {
   protected managePasswords() {
     this.routerService.navigateTo('/passwords?page=1');
   }
-
 }
