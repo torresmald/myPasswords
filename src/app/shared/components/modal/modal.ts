@@ -273,36 +273,29 @@ export class ModalComponent {
   private handleUpdateDataPassword(password: UpdatePassword) {
     password.userId = this.userId();
     password.passwordId = this.password()?.id!;
-    this.loadingService.showLoading(true);
-    this.passwordsService.updatePassword(password).subscribe({
-      next: (response) => {
+    this.passwordsService.updatePasswordMutation.mutate(password, {
+      onSuccess: (response) => {
         this.sharedService.setErrors(response.message, 'success');
         this.modalService.showModal(false);
       },
-      error: (error) => {
-        this.sharedService.setErrors(error);
-      },
-      complete: () => {
-        this.loadingService.showLoading(false);
+      onError: (error: any) => {
+        this.sharedService.setErrors(error.message || 'Error updating Password');
       },
     });
   }
 
   public handleDeletePassword() {
     this.loadingService.showLoading(true);
-    try {
-      this.passwordsService.deletePassword(this.password()?.id!).subscribe({
-        next: (response) => {
-          this.sharedService.setErrors(response.message, 'success');
-
-          this.modalService.resetModal();
-        },
-        error: (error) => this.sharedService.setErrors(error),
-        complete: () => this.loadingService.showLoading(false),
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    this.passwordsService.deletePasswordMutation.mutate(this.password()?.id!, {
+      onSuccess: (response) => {
+        this.sharedService.setErrors(response.message, 'success');
+        this.modalService.resetModal();
+      },
+      onError: (error: any) => {
+        this.sharedService.setErrors(error.message || 'Error deleting password');
+        this.modalService.resetModal();
+      },
+    });
   }
 
   public handleDeleteCategory() {

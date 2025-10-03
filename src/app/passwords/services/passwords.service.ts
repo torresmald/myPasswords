@@ -1,14 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import {  inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 import { catchError, lastValueFrom, map, Observable, tap, throwError } from 'rxjs';
-import {
-  Password,
-  CreatePasswordApiResponse,
-  ViewPassword,
-  UpdatePassword,
-} from '../interfaces';
+import { Password, CreatePasswordApiResponse, ViewPassword, UpdatePassword } from '../interfaces';
 import { AlertService } from '@/shared/services/alert.service';
 import { LoadingService } from '@/shared/services/loading.service';
 import { PaginationData } from '@/category/interfaces';
@@ -90,40 +85,160 @@ export class PasswordsService {
     },
   }));
 
-  public updatePassword(
+  private async updatePassword(
     password: UpdatePassword
-  ): Observable<{ message: string; password: Password }> {
-    return this.http
-      .put<{ message: string; password: Password }>(
-        `${environment.API_URL}/passwords/update`,
-        password
-      )
-      .pipe(
-        tap((response) => {
-          this.passwords$.update((oldPasswords) =>
-            oldPasswords.map((pass) =>
-              pass.id === response.password.id ? response.password : pass
-            )
-          );
-        }),
-        catchError((error) => throwError(() => error))
-      );
+  ): Promise<{ message: string; password: Password }> {
+    this.loadingService.showLoading(true)
+    const response = await lastValueFrom(
+      this.http
+        .put<{ message: string; password: Password }>(
+          `${environment.API_URL}/passwords/update`,
+          password
+        )
+        .pipe(
+          tap((response) => {
+            this.passwords$.update((oldPasswords) =>
+              oldPasswords.map((pass) =>
+                pass.id === response.password.id ? response.password : pass
+              )
+            );
+          }),
+          catchError((error) => throwError(() => error))
+        )
+    );
+    this.loadingService.showLoading(false)
+
+    return response;
   }
 
-  public deletePassword(
+  public updatePasswordMutation = injectMutation(() => ({
+    mutationFn: (data: UpdatePassword) => this.updatePassword(data),
+
+    // 🚀 OPTIMISTIC UPDATE - Actualiza la UI ANTES de que termine la petición
+    onMutate: async (data: UpdatePassword) => {
+      const passwordId = data.categoryId;
+      const passwordName = data.name!;
+
+      if (!passwordId) return;
+
+      // Cancelar queries pendientes
+      await this.queryClient.cancelQueries({ queryKey: ['passwords'] });
+
+      // Snapshot del estado anterior
+      const previousPasswords = this.queryClient.getQueryData([
+        'passwords',
+        this.paginationService.page(),
+      ]);
+
+      // Actualizar optimísticamente - cambiar la categoría en la UI inmediatamente
+      this.queryClient.setQueryData(['passwords', this.paginationService.page()], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: old.data.map((pwd: Password) =>
+            pwd.id === passwordId ? { ...pwd, name: passwordName } : pwd
+          ),
+        };
+      });
+
+      // También actualizar el signal para compatibilidad
+      this.passwords$.update((passwords) =>
+        passwords.map((pwd) => (pwd.id === passwordId ? { ...pwd, name: passwordName } : pwd))
+      );
+
+      return { previousPasswords, passwordId };
+    },
+
+    // Si la petición es exitosa, invalidar queries para sincronizar con el servidor
+    onSuccess: () => {
+      this.queryClient.invalidateQueries({ queryKey: ['passwords'] });
+    },
+
+    // 🔄 Si falla, revertir los cambios optimistas
+    onError: (err, formData, context) => {
+      if (context?.previousPasswords) {
+        this.queryClient.setQueryData(
+          ['passwords', this.paginationService.page()],
+          context.previousPasswords
+        );
+        // Revertir el signal también
+        const prevData = context.previousPasswords as any;
+        if (prevData?.data) {
+          this.passwords$.set(prevData.data);
+        }
+      }
+    },
+  }));
+
+  private async deletePassword(
     passwordId: string
-  ): Observable<{ message: string; passwords: Password[] }> {
-    return this.http
-      .delete<{ message: string; passwords: Password[] }>(
-        `${environment.API_URL}/passwords/delete/${passwordId}`
-      )
-      .pipe(
-        tap((response) => this.passwords$.set(response.passwords)),
-        catchError((error) => throwError(() => error))
-      );
+  ): Promise<{ message: string; passwords: Password[] }> {
+    this.loadingService.showLoading(true);
+
+    const response = await lastValueFrom(
+      this.http
+        .delete<{ message: string; passwords: Password[] }>(
+          `${environment.API_URL}/passwords/delete/${passwordId}`
+        )
+        .pipe(
+          tap((response) => this.passwords$.set(response.passwords)),
+          catchError((error) => throwError(() => error))
+        )
+    );
+    this.loadingService.showLoading(false);
+
+    return response;
   }
 
+  public deletePasswordMutation = injectMutation(() => ({
+    mutationFn: (passwordId: string) => this.deletePassword(passwordId),
 
+    // 🚀 OPTIMISTIC UPDATE - Actualiza la UI ANTES de que termine la petición
+    onMutate: async (deletedId: string) => {
+      // Cancelar queries pendientes que podrían sobrescribir nuestro update optimista
+      await this.queryClient.cancelQueries({ queryKey: ['passwords'] });
+
+      // Snapshot del estado anterior por si necesitamos revertir
+      const previousPasswords = this.queryClient.getQueryData([
+        'passwords',
+        this.paginationService.page(),
+      ]);
+
+      // Actualizar optimísticamente - remover la categoría de la UI inmediatamente
+      this.queryClient.setQueryData(['passwords', this.paginationService.page()], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: old.data.filter((pwd: Password) => pwd.id !== deletedId),
+        };
+      });
+
+      // También actualizar el signal para compatibilidad
+      this.passwords$.update((passwords) => passwords.filter((pwd) => pwd.id !== deletedId));
+
+      return { previousPasswords, deletedId };
+    },
+
+    // Si la petición es exitosa, invalidar queries para sincronizar con el servidor
+    onSuccess: () => {
+      this.queryClient.invalidateQueries({ queryKey: ['passwords'] });
+    },
+
+    // 🔄 Si falla, revertir los cambios optimistas
+    onError: (err, deletedId, context) => {
+      if (context?.previousPasswords) {
+        this.queryClient.setQueryData(
+          ['passwords', this.paginationService.page()],
+          context.previousPasswords
+        );
+        // Revertir el signal también
+        const prevData = context.previousPasswords as any;
+        if (prevData?.data) {
+          this.passwords$.set(prevData.data);
+        }
+      }
+    },
+  }));
 
   private async getAllPasswords(
     page: number = 1,

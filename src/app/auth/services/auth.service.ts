@@ -35,9 +35,6 @@ export class AuthService {
   public getUser = this.user.asReadonly();
   public isUserLogged = signal(false);
 
-  private tokenEffect = effect(() => {
-    console.log('token', this.token());
-  });
 
   public getAuthStatus = computed<AuthStatus>(() => {
     if (this.authStatus() === 'checking') return 'checking';
